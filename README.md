@@ -79,7 +79,7 @@ $ docker-compose exec backend php artisan test
 ```
 
 ```bash
-  PASS  Tests\Unit\ExampleTest
+     PASS  Tests\Unit\ExampleTest
   ✓ example
 
    PASS  Tests\Unit\Models\ClienteTest
@@ -96,10 +96,20 @@ $ docker-compose exec backend php artisan test
    PASS  Tests\Unit\Models\ServicoTest
   ✓ cast valor base para decimal
 
+   PASS  Tests\Unit\Rules\CpfCnpjRuleTest
+  ✓ aceita cpf valido sem mascara
+  ✓ aceita cpf valido com mascara
+  ✓ rejeita cpf com dv errado
+  ✓ rejeita cpf sequencia repetida
+  ✓ aceita cnpj valido
+  ✓ aceita cnpj com mascara
+  ✓ rejeita cnpj invalido
+  ✓ rejeita tamanho invalido
+
    PASS  Tests\Feature\ExampleTest
   ✓ example
 
-  Tests:  8 passed
-  Time:   0.11s
+  Tests:  16 passed
+  Time:   0.14s
 
 ```
