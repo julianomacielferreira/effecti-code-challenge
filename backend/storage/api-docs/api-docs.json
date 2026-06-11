@@ -1,0 +1,263 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Effecti ERP API",
+        "version": "1.0"
+    },
+    "paths": {
+        "/api/clientes": {
+            "get": {
+                "tags": [
+                    "Clientes"
+                ],
+                "summary": "Lista paginada",
+                "operationId": "de55d50d1b708d9e5c63ee3f8fe8f54a",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "Ativo",
+                                "Inativo"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Cliente"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Clientes"
+                ],
+                "summary": "Cria cliente - valida CPF/CNPJ",
+                "operationId": "4ac6cdfa8d6c188fa2cb4f3263d4318a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ClienteStore"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Criado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Cliente"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "CPF duplicado ou inválido"
+                    }
+                }
+            }
+        },
+        "/api/clientes/{id}": {
+            "get": {
+                "tags": [
+                    "Clientes"
+                ],
+                "summary": "Detalha",
+                "operationId": "0d3826d79390929601421b5810b61231",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Cliente"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Clientes"
+                ],
+                "summary": "Atualiza",
+                "operationId": "74956b09f3ea120b5dd531c73776ca11",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ClienteUpdate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Clientes"
+                ],
+                "summary": "Exclui - bloqueia se tiver contrato",
+                "operationId": "d15e304c609752c9f409ab81072fb52e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Sem conteúdo"
+                    },
+                    "422": {
+                        "description": "Possui contratos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Cliente": {
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "nome": {
+                        "type": "string",
+                        "example": "ACME LTDA"
+                    },
+                    "cpf_cnpj": {
+                        "type": "string",
+                        "example": "11222333000181"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "Ativo",
+                            "Inativo"
+                        ]
+                    },
+                    "contratos_count": {
+                        "type": "integer"
+                    }
+                },
+                "type": "object"
+            },
+            "ClienteStore": {
+                "required": [
+                    "nome",
+                    "cpf_cnpj",
+                    "email"
+                ],
+                "properties": {
+                    "nome": {
+                        "type": "string"
+                    },
+                    "cpf_cnpj": {
+                        "type": "string"
+                    },
+                    "email": {
+                        "type": "string"
+                    }
+                },
+                "type": "object"
+            },
+            "ClienteUpdate": {
+                "properties": {
+                    "nome": {
+                        "type": "string"
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "Ativo",
+                            "Inativo"
+                        ]
+                    }
+                },
+                "type": "object"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Clientes",
+            "description": "CRUD de clientes - Regras 1,2,3 do PDF"
+        }
+    ]
+}
