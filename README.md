@@ -11,7 +11,7 @@ O projeto é monorepo com backend e frontend separados, roda no Docker utilizand
 - __Docker / docker-compose__
 
 
-# Banco de Dados
+## Banco de Dados
 
 
 O arquivo [schema.sql](./docker/mysql/schema.sql) contém o código para criação das tabelas é executado toda vez que o container é iniciado.
@@ -27,7 +27,7 @@ Tabela `clientes`
 
 - `cpf_cnpj VARCHAR(14) UNIQUE`
     - Garante unicidade. 
-    - O CHECK aceita só 11 ou 14 dígitos. 
+    - O `CHECK` aceita só 11 ou 14 dígitos. 
     - A validação do dígito verificador (CPF/CNPJ) é feita no Laravel com Rule, porque SQL não calcula Digito Verificador.
 - `email UNIQUE` 
     - impede duplicidade.
