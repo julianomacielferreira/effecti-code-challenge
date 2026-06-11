@@ -10,7 +10,7 @@ O projeto é monorepo com backend e frontend separados, roda no Docker utilizand
 - **Banco**: MySQL 8
 - **Docker / docker-compose**
 
-# Configuração do arquivo .ENV
+## Configuração do arquivo .ENV
 
 Renomeie o arquivo [.env.example](https://github.com/julianomacielferreira/effecti-code-challenge/blob/main/backend/.env.example) para **.env**
 e altere as seguintes variáveis de ambiente:
