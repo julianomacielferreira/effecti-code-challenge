@@ -1,1 +1,4 @@
-# effecti-code-challenge
+# Effecti Code Challenge - Teste Técnico PHP (ERP – Contratos e Serviços)
+
+Desenvolvimento de um ERP simplificado focado em Contratos e Serviços recorrentes. 
+O projeto é monorepo com backend e frontend separados, roda no Docker utilizando as tecnologias Laravel (API REST) em PHP 8.2 + Vue.js 3 e MySQL.
