@@ -64,3 +64,42 @@ Tabela `contrato_itens`
     - Não deixa apagar um Serviço se ele está vinculado a um contrato ativo.
 - `ON DELETE CASCADE` em contrato 
    - Se deletar um contrato, os itens somem juntos.
+
+## Docker
+
+Tanto o **[Docker](https://docs.docker.com/install/) como o [Docker Compose](https://docs.docker.com/compose/install/) devem estar instalados na sua máquina.**
+
+
+## Testes Unitários
+
+Para executar os testes unitários localizados no diretório `backend/app/tests` basta executar o seguinte comando na raiz do projeto:
+
+```bash
+$ docker-compose exec backend php artisan test
+```
+
+```bash
+  PASS  Tests\Unit\ExampleTest
+  ✓ example
+
+   PASS  Tests\Unit\Models\ClienteTest
+  ✓ status padrao e ativo
+  ✓ relacionamento contratos retorna has many
+
+   PASS  Tests\Unit\Models\ContratoItemTest
+  ✓ subtotal calcula quantidade vezes valor
+
+   PASS  Tests\Unit\Models\ContratoTest
+  ✓ accessor total mensal soma itens regra 5
+  ✓ contrato inicia como ativo
+
+   PASS  Tests\Unit\Models\ServicoTest
+  ✓ cast valor base para decimal
+
+   PASS  Tests\Feature\ExampleTest
+  ✓ example
+
+  Tests:  8 passed
+  Time:   0.11s
+
+```

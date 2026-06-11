@@ -1,0 +1,51 @@
+<?php
+/*
+ * The MIT License
+ *
+ * Copyright 2026 Juliano Maciel.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+namespace Tests\Unit\Models;
+
+use Tests\TestCase;
+use App\Models\Cliente;
+use App\Models\Contrato;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
+class ClienteTest extends TestCase
+{
+    /** @test */
+    public function status_padrao_e_ativo()
+    {
+        $cliente = new Cliente(['nome' => 'Juliano Maciel', 'cpf_cnpj' => '12345678901', 'email' => 'juliano_maciel@email.com']);
+
+        $this->assertEquals('Ativo', $cliente->status);
+        $this->assertTrue($cliente->isAtivo());
+    }
+
+    /** @test */
+    public function relacionamento_contratos_retorna_hasMany()
+    {
+        $cliente = new Cliente();
+
+        $this->assertInstanceOf(HasMany::class, $cliente->contratos());
+    }
+}
