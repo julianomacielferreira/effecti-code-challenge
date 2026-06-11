@@ -10,6 +10,28 @@ O projeto é monorepo com backend e frontend separados, roda no Docker utilizand
 - **Banco**: MySQL 8
 - **Docker / docker-compose**
 
+# Configuração do arquivo .ENV
+
+Renomeie o arquivo [.env.example](https://github.com/julianomacielferreira/effecti-code-challenge/blob/main/backend/.env.example) para **.env**
+e altere as seguintes variáveis de ambiente:
+
+```bash
+APP_NAME=Effecti_ERP
+APP_ENV=local
+APP_KEY=base64:Jwj0pOe8Bo8vkP4uYi5rMeEGKLEAtzs4DjslwbTqx/M= # use the output of the `php -r "echo md5(uniqid()).\"\n\";" command`
+APP_DEBUG=true
+APP_URL=http://localhost
+APP_TIMEZONE=UTC
+
+DB_CONNECTION=mysql
+DB_HOST=mysql
+DB_PORT=3306
+DB_DATABASE=effecti_erp
+DB_USERNAME=effecti
+DB_PASSWORD=z0x9c8v7
+
+```
+
 ## Banco de Dados
 
 O arquivo [schema.sql](./docker/mysql/schema.sql) contém o código DDL tabelas.
