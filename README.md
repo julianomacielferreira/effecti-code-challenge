@@ -67,7 +67,7 @@ Tabela `contrato_itens`
 
 ## Docker
 
-Tanto o **[Docker](https://docs.docker.com/install/) como o [Docker Compose](https://docs.docker.com/compose/install/) devem estar instalados na sua máquina.**
+**Tanto o [Docker](https://docs.docker.com/install/) como o [Docker Compose](https://docs.docker.com/compose/install/) devem estar previamente instalados na sua máquina.**
 
 
 ## Testes Unitários
