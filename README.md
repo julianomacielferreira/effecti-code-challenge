@@ -133,7 +133,6 @@ $ docker-compose exec backend php artisan test
 A saída será similar a essa:
 
 ```bash
- 
    PASS  Tests\Unit\Models\ClienteTest
   ✓ status padrao e ativo
   ✓ relacionamento contratos retorna has many
@@ -172,11 +171,37 @@ A saída será similar a essa:
   ✓ rules tem cpfcnpj e unique
   ✓ prepare limpa mascara antes de validar
 
+   PASS  Tests\Unit\Requests\StoreContratoItemRequestTest
+  ✓ servico obrigatorio
+  ✓ servico deve existir
+  ✓ quantidade deve ser positiva
+  ✓ valor unitario deve ser positivo
+  ✓ nao permite servico duplicado no mesmo contrato
+  ✓ aceita dados validos
+
+   PASS  Tests\Unit\Requests\StoreContratoRequestTest
+  ✓ aceita dados validos
+  ✓ data inicio obrigatoria
+  ✓ data termino deve ser maior que inicio
+
    PASS  Tests\Unit\Requests\UpdateClienteRequestTest
   ✓ rules tem cpfcnpj e unique ignore
   ✓ prepare limpa mascara
   ✓ permite manter mesmo cpf no update
   ✓ nao permite cpf de outro cliente
+
+   PASS  Tests\Unit\Requests\UpdateContratoRequestTest
+  ✓ aceita patch vazio
+  ✓ rejeita cliente inexistente
+  ✓ aceita cliente existente
+  ✓ rejeita status invalido
+  ✓ aceita status ativo
+  ✓ aceita status cancelado
+  ✓ rejeita data termino menor que inicio
+  ✓ aceita data termino igual inicio
+  ✓ aceita data termino maior que inicio
+  ✓ nao permite editar contrato cancelado
+  ✓ permite editar contrato ativo
 
    PASS  Tests\Unit\Rules\Contrato\AcrescimoPremiumRuleTest
   ✓ aplica acrescimo quando tem servico premium
@@ -243,12 +268,22 @@ A saída será similar a essa:
   ✓ nao exclui com contrato
   ✓ exclui sem contrato
 
+   PASS  Tests\Feature\Api\ContratoControllerTest
+  ✓ lista paginado
+  ✓ cria contrato
+  ✓ mostra com totais
+  ✓ atualiza contrato
+  ✓ exclui contrato
+  ✓ adiciona item
+  ✓ nao adiciona item em cancelado
+
    PASS  Tests\Feature\Api\ServicoControllerTest
   ✓ cria servico
   ✓ nao deleta em uso
 
-  Tests:  73 passed
-  Time:   1.05s
+  Tests:  100 passed
+  Time:   1.34s
+
 ```
 
 ## Documentação Swagger
