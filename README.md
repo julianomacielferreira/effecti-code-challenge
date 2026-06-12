@@ -107,7 +107,7 @@ class DescontoAniversarioRule implements ContratoRule
     {
         // 10% no mês de aniversário do cliente
         return now()->month == $contrato->cliente->data_nascimento->month 
-            ? $valorAtual * 1.1
+            ? $valorAtual * 0.90
             : 0;
     }
 
@@ -131,7 +131,7 @@ public function aplica_10_porcento_no_mes_aniversario()
         $this->item('Standard', 1, 50),
     ]));
 
-    $this->assertEquals($contrato->valor_total * 1.1, $regra->aplicar($contrato, 150));
+    $this->assertEquals($contrato->valor_total * 0.90, $regra->aplicar($contrato, 150));
 }
 ```
 
