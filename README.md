@@ -484,7 +484,7 @@ Access-Control-Allow-Origin: *
 
 ### Servicos - Listar com filtro (GET): 
 
-- **servicos?search={{search}}**
+- **api/servicos?search={{search}}**
 
 Exemplo:
 
@@ -612,6 +612,312 @@ Exemplo:
 ```bash
 curl -i -X DELETE http://localhost:8000/api/servicos/11 
   -H "Accept: application/json" \
+```
+
+<details>
+<summary><b>Resposta</b></summary>
+
+```bash
+HTTP/1.1 204 No Content
+Server: nginx/1.31.1
+Connection: keep-alive
+X-Powered-By: PHP/7.4.33
+Cache-Control: no-cache, private
+Date: Thu, 11 Jun 2026 23:19:29 GMT
+X-RateLimit-Limit: 60
+X-RateLimit-Remaining: 58
+Access-Control-Allow-Origin: *
+```
+
+</details>
+
+---
+
+### Contratos - Listar (GET): 
+
+- **api/contratos**
+
+Exemplo:
+
+```bash
+$ curl -X GET "http://localhost:8000/api/contratos" \
+  -H "Accept: application/json"
+```
+
+<details>
+<summary><b>Resposta</b></summary>
+
+```json
+{
+    "current_page": 1,
+    "data": [
+        {
+            "id": 26,
+            "cliente_id": 60,
+            "data_inicio": "2024-01-01T00:00:00.000000Z",
+            "data_termino": null,
+            "status": "Ativo",
+            "created_at": "2026-06-12T20:55:30.000000Z",
+            "updated_at": "2026-06-12T20:58:04.000000Z",
+            "valor_total": 1000,
+            "cliente": {
+                "id": 60,
+                "nome": "MLOCKS CONSULTORIA SCSI",
+                "cpf_cnpj": "11222333000181",
+                "email": "contato@email.com",
+                "status": "Ativo",
+                "created_at": "2026-06-12T20:50:37.000000Z",
+                "updated_at": "2026-06-12T20:50:37.000000Z"
+            },
+            "itens": [
+                {
+                    "id": 7,
+                    "contrato_id": 26,
+                    "servico_id": 18,
+                    "quantidade": 10,
+                    "valor_unitario": "100.00",
+                    "created_at": "2026-06-12T21:01:14.000000Z",
+                    "updated_at": "2026-06-12T21:01:14.000000Z",
+                    "servico": {
+                        "id": 18,
+                        "nome": "Oficina Mecânica XSS",
+                        "valor_base_mensal": "694.90",
+                        "created_at": "2026-06-12T20:50:43.000000Z",
+                        "updated_at": "2026-06-12T20:50:43.000000Z"
+                    }
+                }
+            ]
+        }
+    ],
+    "first_page_url": "http://localhost:8000/api/contratos?page=1",
+    "from": 1,
+    "last_page": 1,
+    "last_page_url": "http://localhost:8000/api/contratos?page=1",
+    "links": [
+        {
+            "url": null,
+            "label": "&laquo; Previous",
+            "active": false
+        },
+        {
+            "url": "http://localhost:8000/api/contratos?page=1",
+            "label": "1",
+            "active": true
+        },
+        {
+            "url": null,
+            "label": "Next &raquo;",
+            "active": false
+        }
+    ],
+    "next_page_url": null,
+    "path": "http://localhost:8000/api/contratos",
+    "per_page": 15,
+    "prev_page_url": null,
+    "to": 1,
+    "total": 1
+}
+```
+</details>
+
+---
+
+### Contratos - Criar (POST): 
+
+- **api/contratos**
+
+Exemplo:
+
+```bash
+curl -X POST "http://localhost:8000/api/contratos" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "cliente_id": 60,
+    "data_inicio": "2026-06-12",
+    "status": "Ativo"
+  }'
+```
+
+<details>
+<summary><b>Resposta</b></summary>
+
+```json
+{
+    "status": "Ativo",
+    "cliente_id": 60,
+    "data_inicio": "2026-06-12T00:00:00.000000Z",
+    "updated_at": "2026-06-12T21:59:51.000000Z",
+    "created_at": "2026-06-12T21:59:51.000000Z",
+    "id": 27,
+    "valor_total": 0,
+    "itens": []
+}
+```
+
+</details>
+
+---
+
+### Contratos - Atualizar por Id (PUT): 
+
+- **api/contratos/{{id}}**
+
+Exemplo:
+
+```bash
+$ curl -X PUT "http://localhost:8000/api/contratos/26" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "status": "Cancelado"
+  }'
+```
+
+<details>
+<summary><b>Resposta</b></summary>
+
+```json
+{
+    "id": 26,
+    "cliente_id": 60,
+    "data_inicio": "2024-01-01T00:00:00.000000Z",
+    "data_termino": null,
+    "status": "Cancelado",
+    "created_at": "2026-06-12T20:55:30.000000Z",
+    "updated_at": "2026-06-12T22:01:42.000000Z",
+    "valor_total": 1000,
+    "itens": [
+        {
+            "id": 7,
+            "contrato_id": 26,
+            "servico_id": 18,
+            "quantidade": 10,
+            "valor_unitario": "100.00",
+            "created_at": "2026-06-12T21:01:14.000000Z",
+            "updated_at": "2026-06-12T21:01:14.000000Z"
+        }
+    ]
+}
+```
+
+</details>
+
+---
+
+### Contratos - Recuperar por Id (GET): 
+
+- **api/contratos/{{id}}**
+
+Exemplo:
+
+```bash
+$ curl -X GET "http://localhost:8000/api/contratos/26" \
+  -H "Accept: application/json"
+```
+
+<details>
+<summary><b>Resposta</b></summary>
+
+```json
+{
+    "id": 26,
+    "cliente_id": 60,
+    "data_inicio": "2024-01-01T00:00:00.000000Z",
+    "data_termino": null,
+    "status": "Cancelado",
+    "created_at": "2026-06-12T20:55:30.000000Z",
+    "updated_at": "2026-06-12T22:01:42.000000Z",
+    "totais": {
+        "subtotal": 1000,
+        "total": 950,
+        "desconto_total": 50,
+        "regras_aplicadas": [
+            "desconto_quantidade"
+        ]
+    },
+    "valor_total": 1000,
+    "cliente": {
+        "id": 60,
+        "nome": "MLOCKS CONSULTORIA SCSI",
+        "cpf_cnpj": "11222333000181",
+        "email": "contato@email.com",
+        "status": "Ativo",
+        "created_at": "2026-06-12T20:50:37.000000Z",
+        "updated_at": "2026-06-12T20:50:37.000000Z"
+    },
+    "itens": [
+        {
+            "id": 7,
+            "contrato_id": 26,
+            "servico_id": 18,
+            "quantidade": 10,
+            "valor_unitario": "100.00",
+            "created_at": "2026-06-12T21:01:14.000000Z",
+            "updated_at": "2026-06-12T21:01:14.000000Z",
+            "servico": {
+                "id": 18,
+                "nome": "Oficina Mecânica XSS",
+                "valor_base_mensal": "694.90",
+                "created_at": "2026-06-12T20:50:43.000000Z",
+                "updated_at": "2026-06-12T20:50:43.000000Z"
+            }
+        }
+    ]
+}
+```
+
+</details>
+
+---
+
+
+### Contratos - Adicionar Item (POST): 
+
+- **api/contratos/{{id}}**
+
+Exemplo:
+
+```bash
+$ curl -X POST "http://localhost/api/contratos/27/itens" \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "servico_id": 5,
+    "quantidade": 10,
+    "valor_unitario": 100.00
+  }'
+```
+
+<details>
+<summary><b>Resposta</b></summary>
+
+```json
+{
+    "servico_id": 18,
+    "quantidade": 10,
+    "valor_unitario": "100.00",
+    "contrato_id": 27,
+    "updated_at": "2026-06-12T22:06:36.000000Z",
+    "created_at": "2026-06-12T22:06:36.000000Z",
+    "id": 8
+}
+```
+
+</details>
+
+---
+
+
+### Contratos - Excluir contrato por Id (DELETE): 
+
+- **api/contratos/{{id}}**
+
+Exemplo:
+
+```bash
+$ curl -X DELETE "http://localhost/api/contratos/26" \
+  -H "Accept: application/json"
 ```
 
 <details>
