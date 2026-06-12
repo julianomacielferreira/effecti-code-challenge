@@ -185,6 +185,231 @@
                 }
             }
         },
+        "/api/contratos": {
+            "get": {
+                "tags": [
+                    "Contratos"
+                ],
+                "summary": "Listar contratos paginados",
+                "operationId": "11f09a10344e23955021d6249957653e",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filtrar por status",
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "Ativo",
+                                "Cancelado"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista paginada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Contratos"
+                ],
+                "summary": "Criar novo contrato",
+                "operationId": "8baa1a8b67f0d0ff7c3e54bc36bb7f1d",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "cliente_id",
+                                    "data_inicio"
+                                ],
+                                "properties": {
+                                    "cliente_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "data_inicio": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2024-01-01"
+                                    },
+                                    "data_termino": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "nullable": true
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "Ativo",
+                                            "Cancelado"
+                                        ],
+                                        "example": "Ativo"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Criado"
+                    }
+                }
+            }
+        },
+        "/api/contratos/{id}": {
+            "get": {
+                "tags": [
+                    "Contratos"
+                ],
+                "summary": "Visualizar contrato com itens e total calculado",
+                "operationId": "7b60228bf02b931b36084ba65eb05a2c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Contrato encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Contrato"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Contrato não encontrado"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Contratos"
+                ],
+                "summary": "Atualizar contrato",
+                "operationId": "287076dcac109176c976e161dddd94d5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Contrato"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Atualizado"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Contratos"
+                ],
+                "summary": "Excluir contrato",
+                "operationId": "6dfe1836df08e16da606b639554a30a5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Excluído"
+                    }
+                }
+            }
+        },
+        "/api/contratos/{id}/itens": {
+            "post": {
+                "tags": [
+                    "Contratos"
+                ],
+                "summary": "Adicionar item ao contrato",
+                "operationId": "de1187746adc0094d88c0959533e1ace",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "servico_id",
+                                    "quantidade",
+                                    "valor_unitario"
+                                ],
+                                "properties": {
+                                    "servico_id": {
+                                        "type": "integer",
+                                        "example": 5
+                                    },
+                                    "quantidade": {
+                                        "type": "integer",
+                                        "example": 10
+                                    },
+                                    "valor_unitario": {
+                                        "type": "number",
+                                        "example": 150
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Item adicionado"
+                    }
+                }
+            }
+        },
         "/api/servicos": {
             "get": {
                 "tags": [
@@ -453,6 +678,90 @@
                 },
                 "type": "object"
             },
+            "Contrato": {
+                "title": "Contrato",
+                "required": [
+                    "cliente_id",
+                    "data_inicio",
+                    "status"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "cliente_id": {
+                        "description": "ID do cliente",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "data_inicio": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2024-01-01"
+                    },
+                    "data_termino": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "2024-12-31",
+                        "nullable": true
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "Ativo",
+                            "Cancelado"
+                        ],
+                        "example": "Ativo"
+                    },
+                    "valor_total": {
+                        "description": "Soma dos itens (accessor)",
+                        "type": "number",
+                        "format": "float",
+                        "example": 1500
+                    },
+                    "itens": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ContratoItem"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "ContratoItem": {
+                "title": "Item do Contrato",
+                "required": [
+                    "servico_id",
+                    "quantidade",
+                    "valor_unitario"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "contrato_id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "servico_id": {
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "quantidade": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "example": 10
+                    },
+                    "valor_unitario": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 150
+                    }
+                },
+                "type": "object"
+            },
             "Servico": {
                 "properties": {
                     "id": {
@@ -517,6 +826,10 @@
         {
             "name": "Clientes",
             "description": "CRUD de clientes - Regras 1,2,3 do PDF"
+        },
+        {
+            "name": "Contratos",
+            "description": "Operações de contratos e itens"
         },
         {
             "name": "Serviços",

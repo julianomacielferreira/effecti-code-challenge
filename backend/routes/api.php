@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\ServicoController;
+use App\Http\Controllers\ContratoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,3 +24,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::apiResource('clientes', ClienteController::class);
 Route::apiResource('servicos', ServicoController::class);
+Route::apiResource('contratos', ContratoController::class);
+Route::post('contratos/{id}/itens', [ContratoController::class, 'addItem']);
