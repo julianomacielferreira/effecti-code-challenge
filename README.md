@@ -1028,3 +1028,13 @@ Access-Control-Allow-Origin: *
 </details>
 
 ---
+
+## Referências
+
+- [Simple API using Laravel Lumen](https://github.com/julianomacielferreira/laravel-api-backend)
+- [Laravel](https://laravel.com/)
+- [The Lumen framework](https://lumen.laravel.com/)
+- [MySQL](https://mysql.com)
+- [Docker](https://www.docker.com/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+- [nginx](https://nginx.org/)
