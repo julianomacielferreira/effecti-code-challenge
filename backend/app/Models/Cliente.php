@@ -28,6 +28,26 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+/**
+ * @OA\Schema(
+ *   schema="Cliente",
+ *   @OA\Property(property="id", type="integer"),
+ *   @OA\Property(property="nome", type="string", example="ACME LTDA"),
+ *   @OA\Property(property="cpf_cnpj", type="string", example="11222333000181"),
+ *   @OA\Property(property="email", type="string", format="email"),
+ *   @OA\Property(property="status", type="string", enum={"Ativo","Inativo"}),
+ *   @OA\Property(property="contratos_count", type="integer")
+ * )
+ * @OA\Schema(schema="ClienteStore", required={"nome","cpf_cnpj","email"},
+ *   @OA\Property(property="nome", type="string"),
+ *   @OA\Property(property="cpf_cnpj", type="string"),
+ *   @OA\Property(property="email", type="string")
+ * )
+ * @OA\Schema(schema="ClienteUpdate",
+ *   @OA\Property(property="nome", type="string"),
+ *   @OA\Property(property="status", type="string", enum={"Ativo","Inativo"})
+ * )
+ */
 class Cliente extends Model
 {
     use HasFactory;

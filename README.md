@@ -105,10 +105,6 @@ $ docker-compose exec backend php artisan test
 ```
 
 ```bash
-
- PASS  Tests\Unit\ExampleTest
-  ✓ example
-
    PASS  Tests\Unit\Models\ClienteTest
   ✓ status padrao e ativo
   ✓ relacionamento contratos retorna has many
@@ -123,9 +119,21 @@ $ docker-compose exec backend php artisan test
    PASS  Tests\Unit\Models\ServicoTest
   ✓ cast valor base para decimal
 
+   PASS  Tests\Unit\Repositories\ClienteRepositoryTest
+  ✓ cria cliente limpando mascara
+  ✓ busca por cpf ignorando mascara
+  ✓ nao deleta cliente com contrato ativo
+  ✓ deleta cliente sem contrato
+
    PASS  Tests\Unit\Requests\StoreClienteRequestTest
   ✓ rules tem cpfcnpj e unique
   ✓ prepare limpa mascara antes de validar
+
+   PASS  Tests\Unit\Requests\UpdateClienteRequestTest
+  ✓ rules tem cpfcnpj e unique ignore
+  ✓ prepare limpa mascara
+  ✓ permite manter mesmo cpf no update
+  ✓ nao permite cpf de outro cliente
 
    PASS  Tests\Unit\Rules\CpfCnpjRuleTest
   ✓ aceita cpf valido sem mascara
@@ -137,14 +145,214 @@ $ docker-compose exec backend php artisan test
   ✓ rejeita cnpj invalido
   ✓ rejeita tamanho invalido
 
+   PASS  Tests\Unit\Services\ClienteServiceTest
+  ✓ excluir lanca excecao se tem contrato
+
+   PASS  Tests\Feature\Api\ClienteControllerTest
+  ✓ lista paginado
+  ✓ cria cliente
+  ✓ nao cria duplicado
+  ✓ mostra com contagem
+  ✓ atualiza
+  ✓ nao exclui com contrato
+  ✓ exclui sem contrato
+
    PASS  Tests\Feature\Api\ClienteTest
   ✓ nao permite cadastrar cpf duplicado
 
-   PASS  Tests\Feature\ExampleTest
-  ✓ example
-
-  Tests:  19 passed
-  Time:   0.68s
-
+  Tests:  33 passed
+  Time:   0.80s
 
 ```
+
+## Documentação Swagger
+
+Para acessar documentação Swagger basta acessar http://localhost:8000/api/documentation.
+
+![](effecti-erp-swagger-docs.png)
+
+
+## Endpoints
+
+### Clientes - Listar com filtro (GET): 
+
+- **api/clientes?status={{Ativo|Inativo}}&search={{search}}**
+
+Exemplo:
+
+```bash
+$ curl -s "http://localhost:8000/api/clientes?status=Ativo&search=MLOCKS"
+```
+
+<details>
+<summary><b>Resposta</b></summary>
+
+```json
+{
+   "current_page":1,
+   "data":[
+      {
+         "id":8,
+         "nome":"MLOCKS CONSULTORIA",
+         "cpf_cnpj":"11222333000181",
+         "email":"contato@email.com",
+         "status":"Ativo",
+         "created_at":"2026-06-11T23:09:24.000000Z",
+         "updated_at":"2026-06-11T23:09:24.000000Z",
+         "contratos_count":0
+      }
+   ],
+   "first_page_url":"http:\/\/localhost:8000\/api\/clientes?page=1",
+   "from":1,
+   "last_page":1,
+   "last_page_url":"http:\/\/localhost:8000\/api\/clientes?page=1",
+   "links":[
+      {
+         "url":null,
+         "label":"&laquo; Previous",
+         "active":false
+      },
+      {
+         "url":"http:\/\/localhost:8000\/api\/clientes?page=1",
+         "label":"1",
+         "active":true
+      },
+      {
+         "url":null,
+         "label":"Next &raquo;",
+         "active":false
+      }
+   ],
+   "next_page_url":null,
+   "path":"http:\/\/localhost:8000\/api\/clientes",
+   "per_page":15,
+   "prev_page_url":null,
+   "to":1,
+   "total":1
+}
+```
+</details>
+
+---
+
+### Clientes - Criar (POST): 
+
+- **api/clientes**
+
+Exemplo:
+
+```bash
+curl -s -X POST http://localhost:8000/api/clientes \
+ -H "Content-Type: application/json" \
+ -d '{"nome":"MLOCKS CONSULTORIA","cpf_cnpj":"11.222.333/0001-81","email":"contato@email.com"}'
+```
+
+<details>
+<summary><b>Resposta</b></summary>
+
+```json
+{
+   "status":"Ativo",
+   "nome":"MLOCKS CONSULTORIA",
+   "cpf_cnpj":"11222333000181",
+   "email":"contato@email.com",
+   "updated_at":"2026-06-11T23:09:24.000000Z",
+   "created_at":"2026-06-11T23:09:24.000000Z",
+   "id":8
+}
+```
+
+</details>
+
+---
+
+### Clientes - Recuperar por Id (GET): 
+
+- **api/clientes/{{id}}**
+
+Exemplo:
+
+```bash
+curl -s http://localhost:8000/api/clientes/1
+```
+
+<details>
+<summary><b>Resposta</b></summary>
+
+```json
+{
+   "id":8,
+   "nome":"MLOCKS CONSULTORIA",
+   "cpf_cnpj":"11222333000181",
+   "email":"contato@acme.com",
+   "status":"Ativo",
+   "created_at":"2026-06-11T23:09:24.000000Z",
+   "updated_at":"2026-06-11T23:09:24.000000Z",
+   "contratos_count":0
+}
+```
+
+</details>
+
+---
+
+### Clientes - Atualizar por Id (PUT): 
+
+- **api/clientes/{{id}}**
+
+Exemplo:
+
+```bash
+curl -s -X PUT http://localhost:8000/api/clientes/1 \
+ -H "Content-Type: application/json" \
+ -d '{"status":"Inativo"}'
+```
+
+<details>
+<summary><b>Resposta</b></summary>
+
+```json
+{
+   "id":8,
+   "nome":"MLOCKS CONSULTORIA",
+   "cpf_cnpj":"11222333000181",
+   "email":"contato@acme.com",
+   "status":"Inativo",
+   "created_at":"2026-06-11T23:09:24.000000Z",
+   "updated_at":"2026-06-11T23:17:45.000000Z",
+   "contratos_count":0
+}
+```
+
+</details>
+
+---
+
+### Clientes - Deletar por Id, falha se tiver contrato. (DELETE): 
+
+- **api/clientes/{{id}}**
+
+Exemplo:
+
+```bash
+curl -i -X DELETE http://localhost:8000/api/clientes/8
+```
+
+<details>
+<summary><b>Resposta</b></summary>
+
+```bash
+HTTP/1.1 204 No Content
+Server: nginx/1.31.1
+Connection: keep-alive
+X-Powered-By: PHP/7.4.33
+Cache-Control: no-cache, private
+Date: Thu, 11 Jun 2026 23:19:29 GMT
+X-RateLimit-Limit: 60
+X-RateLimit-Remaining: 58
+Access-Control-Allow-Origin: *
+```
+
+</details>
+
+---
