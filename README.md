@@ -3,6 +3,8 @@
 Desenvolvimento de um ERP simplificado focado em Contratos e Serviços recorrentes.
 O projeto é monorepo com backend e frontend separados, roda no Docker utilizando as tecnologias Laravel (API REST) em PHP 8.2 + Vue.js 3 e MySQL.
 
+#### O backend roda em http://localhost:8000/ e o frontend roda em http://localhost:5173/
+
 ## Stack
 
 - **Backend**: Laravel 8.0 (PHP 7.4) - API REST
@@ -84,7 +86,6 @@ Tabela `contrato_itens`
 - `ON DELETE CASCADE` em contrato
   - Se deletar um contrato, os itens somem juntos.
 
-
 ## Como adicionar uma nova regra para cálculo total do contrato
 
 Foi utilizado o padrão `Strategy` na classe `App\Services\CalculadoraDeContrato`.
@@ -106,7 +107,7 @@ class DescontoAniversarioRule implements ContratoRule
     public function aplicar(Contrato $contrato, float $valorAtual): float
     {
         // 10% no mês de aniversário do cliente
-        return now()->month == $contrato->cliente->data_nascimento->month 
+        return now()->month == $contrato->cliente->data_nascimento->month
             ? $valorAtual * 0.90
             : 0;
     }
@@ -200,10 +201,37 @@ Starting effecti_backend  ... done
 Starting effecti_nginx    ... done
 Attaching to effecti_frontend, effecti_mysql, effecti_backend, effecti_nginx
 effecti_mysql | 2026-06-12 11:33:35+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.46-1.el9 started.
-effecti_nginx | /docker-entrypoint.sh: /docker-entrypoint.d/ is not 
+effecti_nginx | /docker-entrypoint.sh: /docker-entrypoint.d/ is not
 effecti_nginx | /docker-entrypoint.sh: Launching /docker-entrypoint.
 ...
 effecti_mysql | 2026-06-12T11:33:36.208021Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+...
+effecti_frontend |
+effecti_frontend | added 59 packages, and audited 60 packages in 1m
+effecti_frontend |
+effecti_frontend | 11 packages are looking for funding
+effecti_frontend |   run `npm fund` for details
+effecti_frontend |
+effecti_frontend | 2 vulnerabilities (1 moderate, 1 high)
+effecti_frontend |
+effecti_frontend | To address all issues (including breaking changes), run:
+effecti_frontend |   npm audit fix --force
+effecti_frontend |
+effecti_frontend | Run `npm audit` for details.
+effecti_frontend | npm notice
+effecti_frontend | npm notice New major version of npm available! 10.8.2 -> 11.17.0
+effecti_frontend | npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.17.0
+effecti_frontend | npm notice To update run: npm install -g npm@11.17.0
+effecti_frontend | npm notice
+effecti_frontend |
+effecti_frontend | > vue-effecti-erp@1.0.0 dev
+effecti_frontend | > vite --host 0.0.0.0 --port 5173
+effecti_frontend |
+effecti_frontend |
+effecti_frontend |   VITE v5.4.21  ready in 328 ms
+effecti_frontend |
+effecti_frontend |   ➜  Local:   http://localhost:5173/
+effecti_frontend |   ➜  Network: http://172.19.0.3:5173/
 ...
 ```
 
@@ -385,12 +413,11 @@ Para acessar documentação Swagger basta acessar http://localhost:8000/api/docu
 
 ![](effecti-erp-swagger-docs.png)
 
-
 ## Endpoints
 
 Uma coleção de endpoints do Postman está localizada no arquivo [Effecti ERP.postman_collection.json](./Effecti ERP.postman_collection.json) e abaixo estão exemplos de chamadas cURL para os endpoints.
 
-### Clientes - Listar com filtro (GET): 
+### Clientes - Listar com filtro (GET):
 
 - **api/clientes?status={{Ativo|Inativo}}&search={{search}}**
 
@@ -406,53 +433,54 @@ $ curl -s "http://localhost:8000/api/clientes?status=Ativo&search=MLOCKS" \
 
 ```json
 {
-   "current_page":1,
-   "data":[
-      {
-         "id":8,
-         "nome":"MLOCKS CONSULTORIA",
-         "cpf_cnpj":"11222333000181",
-         "email":"contato@email.com",
-         "status":"Ativo",
-         "created_at":"2026-06-11T23:09:24.000000Z",
-         "updated_at":"2026-06-11T23:09:24.000000Z",
-         "contratos_count":0
-      }
-   ],
-   "first_page_url":"http:\/\/localhost:8000\/api\/clientes?page=1",
-   "from":1,
-   "last_page":1,
-   "last_page_url":"http:\/\/localhost:8000\/api\/clientes?page=1",
-   "links":[
-      {
-         "url":null,
-         "label":"&laquo; Previous",
-         "active":false
-      },
-      {
-         "url":"http:\/\/localhost:8000\/api\/clientes?page=1",
-         "label":"1",
-         "active":true
-      },
-      {
-         "url":null,
-         "label":"Next &raquo;",
-         "active":false
-      }
-   ],
-   "next_page_url":null,
-   "path":"http:\/\/localhost:8000\/api\/clientes",
-   "per_page":15,
-   "prev_page_url":null,
-   "to":1,
-   "total":1
+  "current_page": 1,
+  "data": [
+    {
+      "id": 8,
+      "nome": "MLOCKS CONSULTORIA",
+      "cpf_cnpj": "11222333000181",
+      "email": "contato@email.com",
+      "status": "Ativo",
+      "created_at": "2026-06-11T23:09:24.000000Z",
+      "updated_at": "2026-06-11T23:09:24.000000Z",
+      "contratos_count": 0
+    }
+  ],
+  "first_page_url": "http:\/\/localhost:8000\/api\/clientes?page=1",
+  "from": 1,
+  "last_page": 1,
+  "last_page_url": "http:\/\/localhost:8000\/api\/clientes?page=1",
+  "links": [
+    {
+      "url": null,
+      "label": "&laquo; Previous",
+      "active": false
+    },
+    {
+      "url": "http:\/\/localhost:8000\/api\/clientes?page=1",
+      "label": "1",
+      "active": true
+    },
+    {
+      "url": null,
+      "label": "Next &raquo;",
+      "active": false
+    }
+  ],
+  "next_page_url": null,
+  "path": "http:\/\/localhost:8000\/api\/clientes",
+  "per_page": 15,
+  "prev_page_url": null,
+  "to": 1,
+  "total": 1
 }
 ```
+
 </details>
 
 ---
 
-### Clientes - Criar (POST): 
+### Clientes - Criar (POST):
 
 - **api/clientes**
 
@@ -470,13 +498,13 @@ curl -s -X POST http://localhost:8000/api/clientes \
 
 ```json
 {
-   "status":"Ativo",
-   "nome":"MLOCKS CONSULTORIA",
-   "cpf_cnpj":"11222333000181",
-   "email":"contato@email.com",
-   "updated_at":"2026-06-11T23:09:24.000000Z",
-   "created_at":"2026-06-11T23:09:24.000000Z",
-   "id":8
+  "status": "Ativo",
+  "nome": "MLOCKS CONSULTORIA",
+  "cpf_cnpj": "11222333000181",
+  "email": "contato@email.com",
+  "updated_at": "2026-06-11T23:09:24.000000Z",
+  "created_at": "2026-06-11T23:09:24.000000Z",
+  "id": 8
 }
 ```
 
@@ -484,14 +512,14 @@ curl -s -X POST http://localhost:8000/api/clientes \
 
 ---
 
-### Clientes - Recuperar por Id (GET): 
+### Clientes - Recuperar por Id (GET):
 
 - **api/clientes/{{id}}**
 
 Exemplo:
 
 ```bash
-curl -s http://localhost:8000/api/clientes/1  \ 
+curl -s http://localhost:8000/api/clientes/1  \
   -H "Accept: application/json"
 ```
 
@@ -500,14 +528,14 @@ curl -s http://localhost:8000/api/clientes/1  \
 
 ```json
 {
-   "id":8,
-   "nome":"MLOCKS CONSULTORIA",
-   "cpf_cnpj":"11222333000181",
-   "email":"contato@acme.com",
-   "status":"Ativo",
-   "created_at":"2026-06-11T23:09:24.000000Z",
-   "updated_at":"2026-06-11T23:09:24.000000Z",
-   "contratos_count":0
+  "id": 8,
+  "nome": "MLOCKS CONSULTORIA",
+  "cpf_cnpj": "11222333000181",
+  "email": "contato@acme.com",
+  "status": "Ativo",
+  "created_at": "2026-06-11T23:09:24.000000Z",
+  "updated_at": "2026-06-11T23:09:24.000000Z",
+  "contratos_count": 0
 }
 ```
 
@@ -515,7 +543,7 @@ curl -s http://localhost:8000/api/clientes/1  \
 
 ---
 
-### Clientes - Atualizar por Id (PUT): 
+### Clientes - Atualizar por Id (PUT):
 
 - **api/clientes/{{id}}**
 
@@ -532,14 +560,14 @@ curl -s -X PUT http://localhost:8000/api/clientes/1 \
 
 ```json
 {
-   "id":8,
-   "nome":"MLOCKS CONSULTORIA",
-   "cpf_cnpj":"11222333000181",
-   "email":"contato@acme.com",
-   "status":"Inativo",
-   "created_at":"2026-06-11T23:09:24.000000Z",
-   "updated_at":"2026-06-11T23:17:45.000000Z",
-   "contratos_count":0
+  "id": 8,
+  "nome": "MLOCKS CONSULTORIA",
+  "cpf_cnpj": "11222333000181",
+  "email": "contato@acme.com",
+  "status": "Inativo",
+  "created_at": "2026-06-11T23:09:24.000000Z",
+  "updated_at": "2026-06-11T23:17:45.000000Z",
+  "contratos_count": 0
 }
 ```
 
@@ -547,14 +575,14 @@ curl -s -X PUT http://localhost:8000/api/clientes/1 \
 
 ---
 
-### Clientes - Deletar por Id, falha se tiver contrato. (DELETE): 
+### Clientes - Deletar por Id, falha se tiver contrato. (DELETE):
 
 - **api/clientes/{{id}}**
 
 Exemplo:
 
 ```bash
-curl -i -X DELETE http://localhost:8000/api/clientes/8  \ 
+curl -i -X DELETE http://localhost:8000/api/clientes/8  \
   -H "Accept: application/json"
 ```
 
@@ -577,7 +605,7 @@ Access-Control-Allow-Origin: *
 
 ---
 
-### Servicos - Listar com filtro (GET): 
+### Servicos - Listar com filtro (GET):
 
 - **api/servicos?search={{search}}**
 
@@ -592,50 +620,51 @@ $ curl -s "http://localhost:8000/api/servicos?search=OFICINA"
 
 ```json
 {
-    "current_page": 1,
-    "data": [
-        {
-            "id": 13,
-            "nome": "Oficina Mecânica",
-            "valor_base_mensal": "49.90",
-            "created_at": "2026-06-12T13:26:16.000000Z",
-            "updated_at": "2026-06-12T13:26:16.000000Z"
-        }
-    ],
-    "first_page_url": "http://localhost:8000/api/servicos?page=1",
-    "from": 1,
-    "last_page": 1,
-    "last_page_url": "http://localhost:8000/api/servicos?page=1",
-    "links": [
-        {
-            "url": null,
-            "label": "&laquo; Previous",
-            "active": false
-        },
-        {
-            "url": "http://localhost:8000/api/servicos?page=1",
-            "label": "1",
-            "active": true
-        },
-        {
-            "url": null,
-            "label": "Next &raquo;",
-            "active": false
-        }
-    ],
-    "next_page_url": null,
-    "path": "http://localhost:8000/api/servicos",
-    "per_page": 15,
-    "prev_page_url": null,
-    "to": 1,
-    "total": 1
+  "current_page": 1,
+  "data": [
+    {
+      "id": 13,
+      "nome": "Oficina Mecânica",
+      "valor_base_mensal": "49.90",
+      "created_at": "2026-06-12T13:26:16.000000Z",
+      "updated_at": "2026-06-12T13:26:16.000000Z"
+    }
+  ],
+  "first_page_url": "http://localhost:8000/api/servicos?page=1",
+  "from": 1,
+  "last_page": 1,
+  "last_page_url": "http://localhost:8000/api/servicos?page=1",
+  "links": [
+    {
+      "url": null,
+      "label": "&laquo; Previous",
+      "active": false
+    },
+    {
+      "url": "http://localhost:8000/api/servicos?page=1",
+      "label": "1",
+      "active": true
+    },
+    {
+      "url": null,
+      "label": "Next &raquo;",
+      "active": false
+    }
+  ],
+  "next_page_url": null,
+  "path": "http://localhost:8000/api/servicos",
+  "per_page": 15,
+  "prev_page_url": null,
+  "to": 1,
+  "total": 1
 }
 ```
+
 </details>
 
 ---
 
-### Serviços - Criar (POST): 
+### Serviços - Criar (POST):
 
 - **api/servicos**
 
@@ -653,11 +682,11 @@ curl -X POST http://localhost:8000/api/servicos \
 
 ```json
 {
-    "nome": "Cloud Backup",
-    "valor_base_mensal": "49.90",
-    "updated_at": "2026-06-12T13:11:38.000000Z",
-    "created_at": "2026-06-12T13:11:38.000000Z",
-    "id": 10
+  "nome": "Cloud Backup",
+  "valor_base_mensal": "49.90",
+  "updated_at": "2026-06-12T13:11:38.000000Z",
+  "created_at": "2026-06-12T13:11:38.000000Z",
+  "id": 10
 }
 ```
 
@@ -665,7 +694,7 @@ curl -X POST http://localhost:8000/api/servicos \
 
 ---
 
-### Serviços - Atualizar por Id (PUT): 
+### Serviços - Atualizar por Id (PUT):
 
 - **api/servicos/{{id}}**
 
@@ -686,11 +715,11 @@ curl -X PUT http://localhost:8000/api/servicos/1 \
 
 ```json
 {
-    "id": 10,
-    "nome": "Oficina 1223",
-    "valor_base_mensal": "59.90",
-    "created_at": "2026-06-12T14:02:39.000000Z",
-    "updated_at": "2026-06-12T14:03:08.000000Z"
+  "id": 10,
+  "nome": "Oficina 1223",
+  "valor_base_mensal": "59.90",
+  "created_at": "2026-06-12T14:02:39.000000Z",
+  "updated_at": "2026-06-12T14:03:08.000000Z"
 }
 ```
 
@@ -698,14 +727,14 @@ curl -X PUT http://localhost:8000/api/servicos/1 \
 
 ---
 
-### Serviços - Deletar por Id, falha se estiver em uso. (DELETE): 
+### Serviços - Deletar por Id, falha se estiver em uso. (DELETE):
 
 - **api/servicos/{{id}}**
 
 Exemplo:
 
 ```bash
-curl -i -X DELETE http://localhost:8000/api/servicos/11 
+curl -i -X DELETE http://localhost:8000/api/servicos/11
   -H "Accept: application/json" \
 ```
 
@@ -728,7 +757,7 @@ Access-Control-Allow-Origin: *
 
 ---
 
-### Contratos - Listar (GET): 
+### Contratos - Listar (GET):
 
 - **api/contratos**
 
@@ -744,80 +773,81 @@ $ curl -X GET "http://localhost:8000/api/contratos" \
 
 ```json
 {
-    "current_page": 1,
-    "data": [
+  "current_page": 1,
+  "data": [
+    {
+      "id": 26,
+      "cliente_id": 60,
+      "data_inicio": "2024-01-01T00:00:00.000000Z",
+      "data_termino": null,
+      "status": "Ativo",
+      "created_at": "2026-06-12T20:55:30.000000Z",
+      "updated_at": "2026-06-12T20:58:04.000000Z",
+      "valor_total": 1000,
+      "cliente": {
+        "id": 60,
+        "nome": "MLOCKS CONSULTORIA SCSI",
+        "cpf_cnpj": "11222333000181",
+        "email": "contato@email.com",
+        "status": "Ativo",
+        "created_at": "2026-06-12T20:50:37.000000Z",
+        "updated_at": "2026-06-12T20:50:37.000000Z"
+      },
+      "itens": [
         {
-            "id": 26,
-            "cliente_id": 60,
-            "data_inicio": "2024-01-01T00:00:00.000000Z",
-            "data_termino": null,
-            "status": "Ativo",
-            "created_at": "2026-06-12T20:55:30.000000Z",
-            "updated_at": "2026-06-12T20:58:04.000000Z",
-            "valor_total": 1000,
-            "cliente": {
-                "id": 60,
-                "nome": "MLOCKS CONSULTORIA SCSI",
-                "cpf_cnpj": "11222333000181",
-                "email": "contato@email.com",
-                "status": "Ativo",
-                "created_at": "2026-06-12T20:50:37.000000Z",
-                "updated_at": "2026-06-12T20:50:37.000000Z"
-            },
-            "itens": [
-                {
-                    "id": 7,
-                    "contrato_id": 26,
-                    "servico_id": 18,
-                    "quantidade": 10,
-                    "valor_unitario": "100.00",
-                    "created_at": "2026-06-12T21:01:14.000000Z",
-                    "updated_at": "2026-06-12T21:01:14.000000Z",
-                    "servico": {
-                        "id": 18,
-                        "nome": "Oficina Mecânica XSS",
-                        "valor_base_mensal": "694.90",
-                        "created_at": "2026-06-12T20:50:43.000000Z",
-                        "updated_at": "2026-06-12T20:50:43.000000Z"
-                    }
-                }
-            ]
+          "id": 7,
+          "contrato_id": 26,
+          "servico_id": 18,
+          "quantidade": 10,
+          "valor_unitario": "100.00",
+          "created_at": "2026-06-12T21:01:14.000000Z",
+          "updated_at": "2026-06-12T21:01:14.000000Z",
+          "servico": {
+            "id": 18,
+            "nome": "Oficina Mecânica XSS",
+            "valor_base_mensal": "694.90",
+            "created_at": "2026-06-12T20:50:43.000000Z",
+            "updated_at": "2026-06-12T20:50:43.000000Z"
+          }
         }
-    ],
-    "first_page_url": "http://localhost:8000/api/contratos?page=1",
-    "from": 1,
-    "last_page": 1,
-    "last_page_url": "http://localhost:8000/api/contratos?page=1",
-    "links": [
-        {
-            "url": null,
-            "label": "&laquo; Previous",
-            "active": false
-        },
-        {
-            "url": "http://localhost:8000/api/contratos?page=1",
-            "label": "1",
-            "active": true
-        },
-        {
-            "url": null,
-            "label": "Next &raquo;",
-            "active": false
-        }
-    ],
-    "next_page_url": null,
-    "path": "http://localhost:8000/api/contratos",
-    "per_page": 15,
-    "prev_page_url": null,
-    "to": 1,
-    "total": 1
+      ]
+    }
+  ],
+  "first_page_url": "http://localhost:8000/api/contratos?page=1",
+  "from": 1,
+  "last_page": 1,
+  "last_page_url": "http://localhost:8000/api/contratos?page=1",
+  "links": [
+    {
+      "url": null,
+      "label": "&laquo; Previous",
+      "active": false
+    },
+    {
+      "url": "http://localhost:8000/api/contratos?page=1",
+      "label": "1",
+      "active": true
+    },
+    {
+      "url": null,
+      "label": "Next &raquo;",
+      "active": false
+    }
+  ],
+  "next_page_url": null,
+  "path": "http://localhost:8000/api/contratos",
+  "per_page": 15,
+  "prev_page_url": null,
+  "to": 1,
+  "total": 1
 }
 ```
+
 </details>
 
 ---
 
-### Contratos - Criar (POST): 
+### Contratos - Criar (POST):
 
 - **api/contratos**
 
@@ -839,14 +869,14 @@ curl -X POST "http://localhost:8000/api/contratos" \
 
 ```json
 {
-    "status": "Ativo",
-    "cliente_id": 60,
-    "data_inicio": "2026-06-12T00:00:00.000000Z",
-    "updated_at": "2026-06-12T21:59:51.000000Z",
-    "created_at": "2026-06-12T21:59:51.000000Z",
-    "id": 27,
-    "valor_total": 0,
-    "itens": []
+  "status": "Ativo",
+  "cliente_id": 60,
+  "data_inicio": "2026-06-12T00:00:00.000000Z",
+  "updated_at": "2026-06-12T21:59:51.000000Z",
+  "created_at": "2026-06-12T21:59:51.000000Z",
+  "id": 27,
+  "valor_total": 0,
+  "itens": []
 }
 ```
 
@@ -854,7 +884,7 @@ curl -X POST "http://localhost:8000/api/contratos" \
 
 ---
 
-### Contratos - Atualizar por Id (PUT): 
+### Contratos - Atualizar por Id (PUT):
 
 - **api/contratos/{{id}}**
 
@@ -874,25 +904,25 @@ $ curl -X PUT "http://localhost:8000/api/contratos/26" \
 
 ```json
 {
-    "id": 26,
-    "cliente_id": 60,
-    "data_inicio": "2024-01-01T00:00:00.000000Z",
-    "data_termino": null,
-    "status": "Cancelado",
-    "created_at": "2026-06-12T20:55:30.000000Z",
-    "updated_at": "2026-06-12T22:01:42.000000Z",
-    "valor_total": 1000,
-    "itens": [
-        {
-            "id": 7,
-            "contrato_id": 26,
-            "servico_id": 18,
-            "quantidade": 10,
-            "valor_unitario": "100.00",
-            "created_at": "2026-06-12T21:01:14.000000Z",
-            "updated_at": "2026-06-12T21:01:14.000000Z"
-        }
-    ]
+  "id": 26,
+  "cliente_id": 60,
+  "data_inicio": "2024-01-01T00:00:00.000000Z",
+  "data_termino": null,
+  "status": "Cancelado",
+  "created_at": "2026-06-12T20:55:30.000000Z",
+  "updated_at": "2026-06-12T22:01:42.000000Z",
+  "valor_total": 1000,
+  "itens": [
+    {
+      "id": 7,
+      "contrato_id": 26,
+      "servico_id": 18,
+      "quantidade": 10,
+      "valor_unitario": "100.00",
+      "created_at": "2026-06-12T21:01:14.000000Z",
+      "updated_at": "2026-06-12T21:01:14.000000Z"
+    }
+  ]
 }
 ```
 
@@ -900,7 +930,7 @@ $ curl -X PUT "http://localhost:8000/api/contratos/26" \
 
 ---
 
-### Contratos - Recuperar por Id (GET): 
+### Contratos - Recuperar por Id (GET):
 
 - **api/contratos/{{id}}**
 
@@ -916,49 +946,47 @@ $ curl -X GET "http://localhost:8000/api/contratos/26" \
 
 ```json
 {
-    "id": 26,
-    "cliente_id": 60,
-    "data_inicio": "2024-01-01T00:00:00.000000Z",
-    "data_termino": null,
-    "status": "Cancelado",
-    "created_at": "2026-06-12T20:55:30.000000Z",
-    "updated_at": "2026-06-12T22:01:42.000000Z",
-    "totais": {
-        "subtotal": 1000,
-        "total": 950,
-        "desconto_total": 50,
-        "regras_aplicadas": [
-            "desconto_quantidade"
-        ]
-    },
-    "valor_total": 1000,
-    "cliente": {
-        "id": 60,
-        "nome": "MLOCKS CONSULTORIA SCSI",
-        "cpf_cnpj": "11222333000181",
-        "email": "contato@email.com",
-        "status": "Ativo",
-        "created_at": "2026-06-12T20:50:37.000000Z",
-        "updated_at": "2026-06-12T20:50:37.000000Z"
-    },
-    "itens": [
-        {
-            "id": 7,
-            "contrato_id": 26,
-            "servico_id": 18,
-            "quantidade": 10,
-            "valor_unitario": "100.00",
-            "created_at": "2026-06-12T21:01:14.000000Z",
-            "updated_at": "2026-06-12T21:01:14.000000Z",
-            "servico": {
-                "id": 18,
-                "nome": "Oficina Mecânica XSS",
-                "valor_base_mensal": "694.90",
-                "created_at": "2026-06-12T20:50:43.000000Z",
-                "updated_at": "2026-06-12T20:50:43.000000Z"
-            }
-        }
-    ]
+  "id": 26,
+  "cliente_id": 60,
+  "data_inicio": "2024-01-01T00:00:00.000000Z",
+  "data_termino": null,
+  "status": "Cancelado",
+  "created_at": "2026-06-12T20:55:30.000000Z",
+  "updated_at": "2026-06-12T22:01:42.000000Z",
+  "totais": {
+    "subtotal": 1000,
+    "total": 950,
+    "desconto_total": 50,
+    "regras_aplicadas": ["desconto_quantidade"]
+  },
+  "valor_total": 1000,
+  "cliente": {
+    "id": 60,
+    "nome": "MLOCKS CONSULTORIA SCSI",
+    "cpf_cnpj": "11222333000181",
+    "email": "contato@email.com",
+    "status": "Ativo",
+    "created_at": "2026-06-12T20:50:37.000000Z",
+    "updated_at": "2026-06-12T20:50:37.000000Z"
+  },
+  "itens": [
+    {
+      "id": 7,
+      "contrato_id": 26,
+      "servico_id": 18,
+      "quantidade": 10,
+      "valor_unitario": "100.00",
+      "created_at": "2026-06-12T21:01:14.000000Z",
+      "updated_at": "2026-06-12T21:01:14.000000Z",
+      "servico": {
+        "id": 18,
+        "nome": "Oficina Mecânica XSS",
+        "valor_base_mensal": "694.90",
+        "created_at": "2026-06-12T20:50:43.000000Z",
+        "updated_at": "2026-06-12T20:50:43.000000Z"
+      }
+    }
+  ]
 }
 ```
 
@@ -966,8 +994,7 @@ $ curl -X GET "http://localhost:8000/api/contratos/26" \
 
 ---
 
-
-### Contratos - Adicionar Item (POST): 
+### Contratos - Adicionar Item (POST):
 
 - **api/contratos/{{id}}**
 
@@ -989,13 +1016,13 @@ $ curl -X POST "http://localhost/api/contratos/27/itens" \
 
 ```json
 {
-    "servico_id": 18,
-    "quantidade": 10,
-    "valor_unitario": "100.00",
-    "contrato_id": 27,
-    "updated_at": "2026-06-12T22:06:36.000000Z",
-    "created_at": "2026-06-12T22:06:36.000000Z",
-    "id": 8
+  "servico_id": 18,
+  "quantidade": 10,
+  "valor_unitario": "100.00",
+  "contrato_id": 27,
+  "updated_at": "2026-06-12T22:06:36.000000Z",
+  "created_at": "2026-06-12T22:06:36.000000Z",
+  "id": 8
 }
 ```
 
@@ -1003,8 +1030,7 @@ $ curl -X POST "http://localhost/api/contratos/27/itens" \
 
 ---
 
-
-### Contratos - Excluir contrato por Id (DELETE): 
+### Contratos - Excluir contrato por Id (DELETE):
 
 - **api/contratos/{{id}}**
 
@@ -1034,10 +1060,33 @@ Access-Control-Allow-Origin: *
 
 ---
 
+# Effecti ERP - Frontend Vue 3
+
+Aplicação Vue.js 3 para o desafio técnico Effecti ERP (Contratos e Serviços).
+
+Verifique se o backend está rodando em http://localhost:8000
+
+Acesse http://localhost:5173
+
+![](effecti-erp-frontend.png)
+
+## Endpoints utilizados
+
+- **Clientes:** GET, POST, PUT, DELETE /api/clientes
+- **Serviços:** GET, POST, PUT, DELETE /api/servicos
+- **Contratos:** GET, POST, PUT, DELETE /api/contratos
+- **Itens:** POST /api/contratos/{id}/itens
+
+## Tecnologias
+
+- Vue 3 + Vite
+- Vue Router 4
+- Axios
+- TailwindCSS via CDN
+
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-
 
 ## Referências
 
