@@ -84,9 +84,35 @@ Tabela `contrato_itens`
 - `ON DELETE CASCADE` em contrato
   - Se deletar um contrato, os itens somem juntos.
 
-## Docker
+## Inicializar o Projeto com Docker
 
 É necessário instalar o **[Docker](https://docs.docker.com/install/)** como o **[Docker Compose](https://docs.docker.com/compose/install/)** na sua máquina.
+
+Execute os seguintes comandos no terminal:
+
+```bash
+$ docker-compose build
+```
+
+```bash
+$ docker-compose up
+```
+
+A saída será similar a essa:
+
+```bash
+Starting effecti_mysql    ... done
+Starting effecti_frontend ... done
+Starting effecti_backend  ... done
+Starting effecti_nginx    ... done
+Attaching to effecti_frontend, effecti_mysql, effecti_backend, effecti_nginx
+effecti_mysql | 2026-06-12 11:33:35+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.46-1.el9 started.
+effecti_nginx | /docker-entrypoint.sh: /docker-entrypoint.d/ is not 
+effecti_nginx | /docker-entrypoint.sh: Launching /docker-entrypoint.
+...
+effecti_mysql | 2026-06-12T11:33:36.208021Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+...
+```
 
 ## Migrations
 
@@ -103,6 +129,8 @@ Para executar os testes unitários localizados no diretório `backend/app/tests`
 ```bash
 $ docker-compose exec backend php artisan test
 ```
+
+A saída será similar a essa:
 
 ```bash
    PASS  Tests\Unit\Models\ClienteTest
@@ -125,6 +153,14 @@ $ docker-compose exec backend php artisan test
   ✓ nao deleta cliente com contrato ativo
   ✓ deleta cliente sem contrato
 
+   PASS  Tests\Unit\Repositories\ServicoRepositoryTest
+  ✓ cria servico
+  ✓ busca por id
+  ✓ paginate filtra por nome
+  ✓ atualiza servico
+  ✓ deleta servico sem vinculo
+  ✓ nao deleta servico vinculado a contrato
+
    PASS  Tests\Unit\Requests\StoreClienteRequestTest
   ✓ rules tem cpfcnpj e unique
   ✓ prepare limpa mascara antes de validar
@@ -146,7 +182,20 @@ $ docker-compose exec backend php artisan test
   ✓ rejeita tamanho invalido
 
    PASS  Tests\Unit\Services\ClienteServiceTest
+  ✓ listar delega para paginate
+  ✓ buscar delega para find
+  ✓ criar delega para create
+  ✓ atualizar busca e depois atualiza
+  ✓ excluir quando nao tem contrato
   ✓ excluir lanca excecao se tem contrato
+
+   PASS  Tests\Unit\Services\ServicoServiceTest
+  ✓ listar delega para repository paginate
+  ✓ buscar delega para repository find
+  ✓ criar delega para repository create
+  ✓ atualizar busca e depois atualiza
+  ✓ excluir busca e depois deleta
+  ✓ excluir propaga excecao de dominio
 
    PASS  Tests\Feature\Api\ClienteControllerTest
   ✓ lista paginado
@@ -157,12 +206,12 @@ $ docker-compose exec backend php artisan test
   ✓ nao exclui com contrato
   ✓ exclui sem contrato
 
-   PASS  Tests\Feature\Api\ClienteTest
-  ✓ nao permite cadastrar cpf duplicado
+   PASS  Tests\Feature\Api\ServicoControllerTest
+  ✓ cria servico
+  ✓ nao deleta em uso
 
-  Tests:  33 passed
-  Time:   0.80s
-
+  Tests:  51 passed
+  Time:   0.91s
 ```
 
 ## Documentação Swagger
@@ -181,7 +230,8 @@ Para acessar documentação Swagger basta acessar http://localhost:8000/api/docu
 Exemplo:
 
 ```bash
-$ curl -s "http://localhost:8000/api/clientes?status=Ativo&search=MLOCKS"
+$ curl -s "http://localhost:8000/api/clientes?status=Ativo&search=MLOCKS" \
+ -H "Accept: application/json"
 ```
 
 <details>
@@ -243,6 +293,7 @@ Exemplo:
 
 ```bash
 curl -s -X POST http://localhost:8000/api/clientes \
+ -H "Accept: application/json"
  -H "Content-Type: application/json" \
  -d '{"nome":"MLOCKS CONSULTORIA","cpf_cnpj":"11.222.333/0001-81","email":"contato@email.com"}'
 ```
@@ -273,7 +324,8 @@ curl -s -X POST http://localhost:8000/api/clientes \
 Exemplo:
 
 ```bash
-curl -s http://localhost:8000/api/clientes/1
+curl -s http://localhost:8000/api/clientes/1  \ 
+  -H "Accept: application/json"
 ```
 
 <details>
@@ -335,7 +387,159 @@ curl -s -X PUT http://localhost:8000/api/clientes/1 \
 Exemplo:
 
 ```bash
-curl -i -X DELETE http://localhost:8000/api/clientes/8
+curl -i -X DELETE http://localhost:8000/api/clientes/8  \ 
+  -H "Accept: application/json"
+```
+
+<details>
+<summary><b>Resposta</b></summary>
+
+```bash
+HTTP/1.1 204 No Content
+Server: nginx/1.31.1
+Connection: keep-alive
+X-Powered-By: PHP/7.4.33
+Cache-Control: no-cache, private
+Date: Thu, 11 Jun 2026 23:19:29 GMT
+X-RateLimit-Limit: 60
+X-RateLimit-Remaining: 58
+Access-Control-Allow-Origin: *
+```
+
+</details>
+
+---
+
+### Servicos - Listar com filtro (GET): 
+
+- **servicos?search={{search}}**
+
+Exemplo:
+
+```bash
+$ curl -s "http://localhost:8000/api/servicos?search=OFICINA"
+```
+
+<details>
+<summary><b>Resposta</b></summary>
+
+```json
+{
+    "current_page": 1,
+    "data": [
+        {
+            "id": 13,
+            "nome": "Oficina Mecânica",
+            "valor_base_mensal": "49.90",
+            "created_at": "2026-06-12T13:26:16.000000Z",
+            "updated_at": "2026-06-12T13:26:16.000000Z"
+        }
+    ],
+    "first_page_url": "http://localhost:8000/api/servicos?page=1",
+    "from": 1,
+    "last_page": 1,
+    "last_page_url": "http://localhost:8000/api/servicos?page=1",
+    "links": [
+        {
+            "url": null,
+            "label": "&laquo; Previous",
+            "active": false
+        },
+        {
+            "url": "http://localhost:8000/api/servicos?page=1",
+            "label": "1",
+            "active": true
+        },
+        {
+            "url": null,
+            "label": "Next &raquo;",
+            "active": false
+        }
+    ],
+    "next_page_url": null,
+    "path": "http://localhost:8000/api/servicos",
+    "per_page": 15,
+    "prev_page_url": null,
+    "to": 1,
+    "total": 1
+}
+```
+</details>
+
+---
+
+### Serviços - Criar (POST): 
+
+- **api/servicos**
+
+Exemplo:
+
+```bash
+curl -X POST http://localhost:8000/api/servicos \
+ -H "Accept: application/json" \
+ -H "Content-Type: application/json" \
+ -d '{"nome":"Oficina de Bikes","valor_base_mensal":49.90}'
+```
+
+<details>
+<summary><b>Resposta</b></summary>
+
+```json
+{
+    "nome": "Cloud Backup",
+    "valor_base_mensal": "49.90",
+    "updated_at": "2026-06-12T13:11:38.000000Z",
+    "created_at": "2026-06-12T13:11:38.000000Z",
+    "id": 10
+}
+```
+
+</details>
+
+---
+
+### Serviços - Atualizar por Id (PUT): 
+
+- **api/servicos/{{id}}**
+
+Exemplo:
+
+```bash
+curl -X PUT http://localhost:8000/api/servicos/1 \
+  -H "Accept: application/json" \
+  -H "Content-Type: application/json" \
+ --data '{
+    "nome": "Oficina 1223",
+    "valor_base_mensal": 59.90
+  }'
+```
+
+<details>
+<summary><b>Resposta</b></summary>
+
+```json
+{
+    "id": 10,
+    "nome": "Oficina 1223",
+    "valor_base_mensal": "59.90",
+    "created_at": "2026-06-12T14:02:39.000000Z",
+    "updated_at": "2026-06-12T14:03:08.000000Z"
+}
+```
+
+</details>
+
+---
+
+### Serviços - Deletar por Id, falha se estiver em uso. (DELETE): 
+
+- **api/servicos/{{id}}**
+
+Exemplo:
+
+```bash
+curl -i -X DELETE http://localhost:8000/api/servicos/11 
+  -H "Accept: application/json" \
 ```
 
 <details>

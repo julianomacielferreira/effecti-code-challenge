@@ -184,6 +184,207 @@
                     }
                 }
             }
+        },
+        "/api/servicos": {
+            "get": {
+                "tags": [
+                    "Serviços"
+                ],
+                "summary": "Lista paginada de serviços",
+                "description": "Retorna serviços com filtro opcional por nome",
+                "operationId": "16fd13f4f66c0daa1379d1949fe23b05",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "Filtra por nome",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "Internet"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "current_page": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Servico"
+                                            }
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "example": 2
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Serviços"
+                ],
+                "summary": "Cria um novo serviço",
+                "operationId": "c28337c7fc0e5c39322dc143399e2240",
+                "requestBody": {
+                    "description": "Dados do serviço",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ServicoStore"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Criado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Servico"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validação falhou (nome duplicado ou valor inválido)"
+                    }
+                }
+            }
+        },
+        "/api/servicos/{id}": {
+            "get": {
+                "tags": [
+                    "Serviços"
+                ],
+                "summary": "Detalha um serviço",
+                "operationId": "16aed17b468eae5ca1f359be70629727",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID do serviço",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Servico"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Não encontrado"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Serviços"
+                ],
+                "summary": "Atualiza serviço",
+                "operationId": "0e0951239106420aeea678fbe3cc21e9",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ServicoUpdate"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Atualizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Servico"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validação"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Serviços"
+                ],
+                "summary": "Exclui serviço - bloqueia se estiver em uso",
+                "operationId": "d6ae0ce3ca2c44964a431754aedb8dae",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Excluído com sucesso"
+                    },
+                    "422": {
+                        "description": "Serviço em uso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Serviço está vinculado a contratos e não pode ser excluído."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -251,6 +452,64 @@
                     }
                 },
                 "type": "object"
+            },
+            "Servico": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "nome": {
+                        "type": "string",
+                        "example": "Internet Fibra"
+                    },
+                    "valor_base_mensal": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 99.9
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "ServicoStore": {
+                "required": [
+                    "nome",
+                    "valor_base_mensal"
+                ],
+                "properties": {
+                    "nome": {
+                        "type": "string",
+                        "example": "Cloud Backup"
+                    },
+                    "valor_base_mensal": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 49.9
+                    }
+                },
+                "type": "object"
+            },
+            "ServicoUpdate": {
+                "properties": {
+                    "nome": {
+                        "type": "string",
+                        "example": "Cloud Backup Pro"
+                    },
+                    "valor_base_mensal": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 59.9
+                    }
+                },
+                "type": "object"
             }
         }
     },
@@ -258,6 +517,10 @@
         {
             "name": "Clientes",
             "description": "CRUD de clientes - Regras 1,2,3 do PDF"
+        },
+        {
+            "name": "Serviços",
+            "description": "CRUD de serviços - Regra: não excluir se estiver em contrato"
         }
     ]
 }
