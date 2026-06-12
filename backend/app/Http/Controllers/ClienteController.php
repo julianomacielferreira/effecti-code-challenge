@@ -29,6 +29,7 @@ use App\Http\Requests\StoreClienteRequest;
 use App\Http\Requests\UpdateClienteRequest;
 use App\Services\ClienteService;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use DomainException;
 
 /**
@@ -72,8 +73,9 @@ class ClienteController extends Controller
      */
     public function store(StoreClienteRequest $request)
     {
-        $c = $this->service->criar($request->validated());
-        return response()->json($c, 201);
+        $cliente = $this->service->criar($request->validated());
+
+        return response()->json($cliente,  Response::HTTP_CREATED);
     }
 
     /**
@@ -96,7 +98,9 @@ class ClienteController extends Controller
      */
     public function update(UpdateClienteRequest $request, int $id)
     {
-        return response()->json($this->service->atualizar($id, $request->validated()));
+        $cliente = $this->service->atualizar($id, $request->validated());
+
+        return response()->json($cliente);
     }
 
     /**
@@ -109,10 +113,15 @@ class ClienteController extends Controller
     public function destroy(int $id)
     {
         try {
+
             $this->service->excluir($id);
-            return response()->json(null, 204);
-        } catch (DomainException $e) {
-            return response()->json(['message' => $e->getMessage()], 422);
+
+            return response()->json(null, Response::HTTP_NO_CONTENT);
+        } catch (DomainException $ex) {
+            return response()->json(
+                ['message' => $ex->getMessage()],
+                Response::HTTP_UNPROCESSABLE_ENTITY
+            );
         }
     }
 }
