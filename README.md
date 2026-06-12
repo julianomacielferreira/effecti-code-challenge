@@ -1029,11 +1029,15 @@ Access-Control-Allow-Origin: *
 
 ---
 
+## License
+
+The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+
 ## Referências
 
 - [Simple API using Laravel Lumen](https://github.com/julianomacielferreira/laravel-api-backend)
 - [Laravel](https://laravel.com/)
-- [The Lumen framework](https://lumen.laravel.com/)
 - [MySQL](https://mysql.com)
 - [Docker](https://www.docker.com/)
 - [Docker Compose](https://docs.docker.com/compose/install/)
