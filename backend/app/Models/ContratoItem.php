@@ -28,6 +28,29 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+/**
+ * @OA\Schema(
+ *     schema="ContratoItem",
+ *     type="object",
+ *     title="Item do Contrato",
+ *     required={"servico_id", "quantidade", "valor_unitario"},
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="contrato_id", type="integer", example=1),
+ *     @OA\Property(property="servico_id", type="integer", example=5),
+ *     @OA\Property(
+ *         property="quantidade",
+ *         type="integer",
+ *         minimum=1,
+ *         example=10
+ *     ),
+ *     @OA\Property(
+ *         property="valor_unitario",
+ *         type="number",
+ *         format="float",
+ *         example=150.00
+ *     )
+ * )
+ */
 class ContratoItem extends Model
 {
     use HasFactory;
