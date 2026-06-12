@@ -37,7 +37,7 @@ use DomainException;
  */
 class ClienteController extends Controller
 {
-    private $service;
+    private ClienteService $service;
 
     public function __construct(ClienteService $service)
     {
@@ -82,7 +82,7 @@ class ClienteController extends Controller
      *   @OA\Response(response=200, description="OK", @OA\JsonContent(ref="#/components/schemas/Cliente"))
      * )
      */
-    public function show($id)
+    public function show(int $id)
     {
         return response()->json($this->service->buscar($id));
     }
@@ -94,7 +94,7 @@ class ClienteController extends Controller
      *   @OA\Response(response=200, description="OK")
      * )
      */
-    public function update(UpdateClienteRequest $request, $id)
+    public function update(UpdateClienteRequest $request, int $id)
     {
         return response()->json($this->service->atualizar($id, $request->validated()));
     }
@@ -106,7 +106,7 @@ class ClienteController extends Controller
      *   @OA\Response(response=422, description="Possui contratos", @OA\JsonContent(@OA\Property(property="message", type="string")))
      * )
      */
-    public function destroy($id)
+    public function destroy(int $id)
     {
         try {
             $this->service->excluir($id);
