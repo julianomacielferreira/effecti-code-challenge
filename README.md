@@ -111,7 +111,7 @@ class DescontoAniversarioRule implements ContratoRule
             : 0;
     }
 
-    public function descricao(): string
+    public function nome(): string
     {
         return 'Desconto Aniversário 10%';
     }
