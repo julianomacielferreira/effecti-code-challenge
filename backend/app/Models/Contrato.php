@@ -28,6 +28,56 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+/**
+ * @OA\Schema(
+ *     schema="Contrato",
+ *     type="object",
+ *     title="Contrato",
+ *     required={"cliente_id", "data_inicio", "status"},
+ *     @OA\Property(
+ *         property="id",
+ *         type="integer",
+ *         example=1
+ *     ),
+ *     @OA\Property(
+ *         property="cliente_id",
+ *         type="integer",
+ *         description="ID do cliente",
+ *         example=1
+ *     ),
+ *     @OA\Property(
+ *         property="data_inicio",
+ *         type="string",
+ *         format="date",
+ *         example="2024-01-01"
+ *     ),
+ *     @OA\Property(
+ *         property="data_termino",
+ *         type="string",
+ *         format="date",
+ *         nullable=true,
+ *         example="2024-12-31"
+ *     ),
+ *     @OA\Property(
+ *         property="status",
+ *         type="string",
+ *         enum={"Ativo", "Cancelado"},
+ *         example="Ativo"
+ *     ),
+ *     @OA\Property(
+ *         property="valor_total",
+ *         type="number",
+ *         format="float",
+ *         description="Soma dos itens (accessor)",
+ *         example=1500.00
+ *     ),
+ *     @OA\Property(
+ *         property="itens",
+ *         type="array",
+ *         @OA\Items(ref="#/components/schemas/ContratoItem")
+ *     )
+ * )
+ */
 class Contrato extends Model
 {
     use HasFactory;
@@ -44,6 +94,8 @@ class Contrato extends Model
     protected $attributes = [
         'status' => 'Ativo',
     ];
+
+    protected $appends = ['valor_total'];
 
     public function cliente()
     {
@@ -75,6 +127,13 @@ class Contrato extends Model
         return (float) $this->itens()
             ->selectRaw('COALESCE(SUM(quantidade * valor_unitario),0) as total')
             ->value('total');
+    }
+
+    public function getValorTotalAttribute()
+    {
+        return $this->itens->sum(function ($i) {
+            return $i->quantidade * $i->valor_unitario;
+        });
     }
 
     public function isCancelado(): bool
