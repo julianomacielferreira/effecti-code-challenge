@@ -28,6 +28,30 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+/**
+ * @OA\Schema(
+ *   schema="Servico",
+ *   type="object",
+ *   @OA\Property(property="id", type="integer", example=1),
+ *   @OA\Property(property="nome", type="string", example="Internet Fibra"),
+ *   @OA\Property(property="valor_base_mensal", type="number", format="float", example=99.90),
+ *   @OA\Property(property="created_at", type="string", format="date-time"),
+ *   @OA\Property(property="updated_at", type="string", format="date-time")
+ * )
+ * @OA\Schema(
+ *   schema="ServicoStore",
+ *   type="object",
+ *   required={"nome","valor_base_mensal"},
+ *   @OA\Property(property="nome", type="string", example="Cloud Backup"),
+ *   @OA\Property(property="valor_base_mensal", type="number", format="float", example=49.90)
+ * )
+ * @OA\Schema(
+ *   schema="ServicoUpdate",
+ *   type="object",
+ *   @OA\Property(property="nome", type="string", example="Cloud Backup Pro"),
+ *   @OA\Property(property="valor_base_mensal", type="number", format="float", example=59.90)
+ * )
+ */
 class Servico extends Model
 {
     use HasFactory;
@@ -43,5 +67,10 @@ class Servico extends Model
     public function itens()
     {
         return $this->hasMany(ContratoItem::class);
+    }
+
+    public function contratoItens()
+    {
+        return $this->hasMany(ContratoItem::class, 'servico_id');
     }
 }
