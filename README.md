@@ -1084,10 +1084,6 @@ Acesse http://localhost:5173
 - Axios
 - TailwindCSS via CDN
 
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-
 ## Referências
 
 - [Simple API using Laravel Lumen](https://github.com/julianomacielferreira/laravel-api-backend)
@@ -1096,3 +1092,11 @@ The Laravel framework is open-sourced software licensed under the [MIT license](
 - [Docker](https://www.docker.com/)
 - [Docker Compose](https://docs.docker.com/compose/install/)
 - [nginx](https://nginx.org/)
+- [Vue.js - The Progressive JavaScript Framework](https://vuejs.org/)
+- [Vite | Next Generation Frontend Tooling](https://vite.dev/)
+
+## License
+
+The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+Vue.js - The Progressive JavaScript Framework is released under the [MIT license](https://opensource.org/licenses/MIT).
