@@ -84,6 +84,103 @@ Tabela `contrato_itens`
 - `ON DELETE CASCADE` em contrato
   - Se deletar um contrato, os itens somem juntos.
 
+
+## Como adicionar uma nova regra para cálculo total do contrato
+
+Foi utilizado o padrão `Strategy` na classe `App\Services\CalculadoraDeContrato`.
+
+```
+App\Services\Contrato\CalculadoraDeContrato
+ └─> usa: App\Rules\Contrato\ContratoRule (interface)
+      ├─ AcrescimoPremiumRule
+      ├─ DescontoFidelidadeRule
+      ├─ DescontoPorQuantidadeRule
+      └─ SemDescontoRule
+```
+
+Cada regra recebe o Contrato e devolve um ajuste. A Calculadora só soma os resultados — ela não sabe como cada desconto funciona.
+
+Para adicionar uma nova regra que cria um desconto de aniversário você pode seguir o seguinte exemplo:
+
+1. Crie uma nova classe Rule no arquivo `app/Rules/Contrato/DescontoAniversarioRule.php`
+
+```php
+<?php
+namespace App\Rules\Contrato;
+
+use App\Models\Contrato;
+
+class DescontoAniversarioRule implements ContratoRule
+{
+    public function aplicar(Contrato $contrato): float
+    {
+        // 10% no mês de aniversário do cliente
+        return now()->month == $contrato->cliente->data_nascimento->month 
+            ? -$contrato->valor_total * 0.10 
+            : 0;
+    }
+
+    public function descricao(): string
+    {
+        return 'Desconto Aniversário 10%';
+    }
+}
+```
+
+2. Crie um teste isolado `tests/Unit/Rules/DescontoAniversarioRuleTest.php`:
+
+```php
+/** @test */
+public function aplica_10_porcento_no_mes_aniversario()
+{
+    $contrato = Contrato::factory()->create();
+    $regra = new DescontoAniversarioRule();
+    $this->assertEquals(-$contrato->valor_total*0.1, $regra->aplicar($contrato));
+}
+```
+
+3. Config – adicione a nova regra ativa em `config/contrato.php`:
+
+```php
+return [
+    'regras' => [
+        \App\Rules\Contrato\DescontoPorQuantidadeRule::class,
+        \App\Rules\Contrato\DescontoFidelidadeRule::class,
+        \App\Rules\Contrato\AcrescimoPremiumRule::class,
+        // adicione novas regras aqui
+        \App\Rules\Contrato\DescontoAniversarioRule::class,
+    ],
+];
+```
+
+4. A injeção já acontece no `App\Providers\AppServiceProvider`:
+
+```php
+ public function register()
+    {
+        $this->app->singleton(CalculadoraDeContrato::class, function ($app) {
+
+            $classes = config('contrato.regras', []);
+
+            if (empty($classes)) {
+                $classes = [SemDescontoRule::class];
+            }
+
+            $regras = array_map(function ($classe) use ($app) {
+                return $app->make($classe);
+            }, $classes);
+
+            return new CalculadoraDeContrato($regras);
+        });
+    }
+```
+
+### Vantagens dessa abordagem
+
+- Para expandir ou remover as regras não é necessário modificar o Controller ou Service: basta só criar a classe e adicionar no contrato config ou remover a linha de uma já existente.
+- Para alterar a sequência de aplicação é só mudar a ordem no array.
+- Para desativar basta comentar a linha no config, sem necessidade de deletar outros códigos da aplicação.
+
 ## Inicializar o Projeto com Docker
 
 É necessário instalar o **[Docker](https://docs.docker.com/install/)** como o **[Docker Compose](https://docs.docker.com/compose/install/)** na sua máquina.
