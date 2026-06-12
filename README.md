@@ -89,7 +89,7 @@ Tabela `contrato_itens`
 
 Foi utilizado o padrão `Strategy` na classe `App\Services\CalculadoraDeContrato`.
 
-Cada regra recebe o Contrato e devolve um novo valor total. A Calculadora só soma os resultados — ela não sabe como cada desconto funciona.
+Cada regra recebe o Contrato e o valor atual e devolve um o valor com desconto aplicado. A Calculadora só soma os resultados — ela não sabe como cada desconto funciona.
 
 Por exemplo, para adicionar uma nova regra que cria um desconto de aniversário você pode seguir o seguinte exemplo:
 
@@ -103,11 +103,11 @@ use App\Models\Contrato;
 
 class DescontoAniversarioRule implements ContratoRule
 {
-    public function aplicar(Contrato $contrato): float
+    public function aplicar(Contrato $contrato, float $valorAtual): float
     {
         // 10% no mês de aniversário do cliente
         return now()->month == $contrato->cliente->data_nascimento->month 
-            ? -$contrato->valor_total * 0.10 
+            ? $valorAtual * 1.1
             : 0;
     }
 
@@ -131,7 +131,7 @@ public function aplica_10_porcento_no_mes_aniversario()
         $this->item('Standard', 1, 50),
     ]));
 
-    $this->assertEquals(-$contrato->valor_total*0.1, $regra->aplicar($contrato));
+    $this->assertEquals($contrato->valor_total * 1.1, $regra->aplicar($contrato, 150));
 }
 ```
 
