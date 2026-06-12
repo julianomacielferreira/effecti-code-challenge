@@ -89,15 +89,6 @@ Tabela `contrato_itens`
 
 Foi utilizado o padrão `Strategy` na classe `App\Services\CalculadoraDeContrato`.
 
-```
-App\Services\Contrato\CalculadoraDeContrato
- └─> usa: App\Rules\Contrato\ContratoRule (interface)
-      ├─ AcrescimoPremiumRule
-      ├─ DescontoFidelidadeRule
-      ├─ DescontoPorQuantidadeRule
-      └─ SemDescontoRule
-```
-
 Cada regra recebe o Contrato e devolve um ajuste. A Calculadora só soma os resultados — ela não sabe como cada desconto funciona.
 
 Para adicionar uma nova regra que cria um desconto de aniversário você pode seguir o seguinte exemplo:
