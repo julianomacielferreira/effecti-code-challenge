@@ -133,7 +133,8 @@ $ docker-compose exec backend php artisan test
 A saída será similar a essa:
 
 ```bash
-      PASS  Tests\Unit\Models\ClienteTest
+ 
+   PASS  Tests\Unit\Models\ClienteTest
   ✓ status padrao e ativo
   ✓ relacionamento contratos retorna has many
 
@@ -153,6 +154,12 @@ A saída será similar a essa:
   ✓ nao deleta cliente com contrato ativo
   ✓ deleta cliente sem contrato
 
+   PASS  Tests\Unit\Repositories\ContratoRepositoryTest
+  ✓ find retorna com relacionamentos
+  ✓ find lanca excecao se nao existir
+  ✓ create persiste dados
+  ✓ paginate filtra por status
+
    PASS  Tests\Unit\Repositories\ServicoRepositoryTest
   ✓ cria servico
   ✓ busca por id
@@ -171,6 +178,26 @@ A saída será similar a essa:
   ✓ permite manter mesmo cpf no update
   ✓ nao permite cpf de outro cliente
 
+   PASS  Tests\Unit\Rules\Contrato\AcrescimoPremiumRuleTest
+  ✓ aplica acrescimo quando tem servico premium
+  ✓ nao aplica acrescimo sem servico premium
+  ✓ detecta premium case insensitive
+  ✓ nome retorna identificador correto
+  ✓ funciona no pipeline com outras regras
+
+   PASS  Tests\Unit\Rules\Contrato\DescontoFidelidadeRuleTest
+  ✓ aplica 3 porcento para cliente antigo
+  ✓ nao aplica para cliente novo
+
+   PASS  Tests\Unit\Rules\Contrato\DescontoPorQuantidadeRuleTest
+  ✓ nao aplica desconto abaixo de 10
+  ✓ aplica 5 porcento para 10 a 19
+  ✓ aplica 10 porcento para 20 ou mais
+  ✓ nome retorna identificador
+
+   PASS  Tests\Unit\Rules\Contrato\SemDescontoRuleTest
+  ✓ retorna mesmo valor
+
    PASS  Tests\Unit\Rules\CpfCnpjRuleTest
   ✓ aceita cpf valido sem mascara
   ✓ aceita cpf valido com mascara
@@ -181,6 +208,10 @@ A saída será similar a essa:
   ✓ rejeita cnpj invalido
   ✓ rejeita tamanho invalido
 
+   PASS  Tests\Unit\Services\Contrato\CalculadoraDeContratoTest
+  ✓ calcula subtotal sem regras
+  ✓ aplica multiplas regras em pipeline
+
    PASS  Tests\Unit\Services\ClienteServiceTest
   ✓ listar delega para paginate
   ✓ buscar delega para find
@@ -188,6 +219,12 @@ A saída será similar a essa:
   ✓ atualizar busca e depois atualiza
   ✓ excluir quando nao tem contrato
   ✓ excluir lanca excecao se tem contrato
+
+   PASS  Tests\Unit\Services\ContratoServiceTest
+  ✓ listar delega para paginate
+  ✓ buscar delega para find e adiciona totais
+  ✓ criar delega para create
+  ✓ calcular total delega para calculadora
 
    PASS  Tests\Unit\Services\ServicoServiceTest
   ✓ listar delega para repository paginate
@@ -210,9 +247,8 @@ A saída será similar a essa:
   ✓ cria servico
   ✓ nao deleta em uso
 
-  Tests:  51 passed
-  Time:   0.92s
-
+  Tests:  73 passed
+  Time:   1.05s
 ```
 
 ## Documentação Swagger
