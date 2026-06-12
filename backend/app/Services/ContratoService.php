@@ -27,6 +27,7 @@ namespace App\Services;
 
 use App\Repositories\ContratoRepository;
 use App\Services\CalculadoraDeContrato;
+use Illuminate\Support\Facades\DB;
 
 class ContratoService
 {
@@ -47,7 +48,7 @@ class ContratoService
     public function buscar(int $id)
     {
         $contrato = $this->repository->find($id);
-
+        $contrato->load('itens.servico', 'cliente');
         $contrato->totais = $this->calculadora->calcular($contrato);
 
         return $contrato;
@@ -58,10 +59,47 @@ class ContratoService
         return $this->repository->create($dados);
     }
 
-    public function calcularTotal(int $id): array
+    public function atualizar(int $id, array $dados)
     {
         $contrato = $this->repository->find($id);
 
+        // Regra PDF: Cancelado trava edição
+        if ($contrato->status === 'Cancelado') {
+            abort(422, 'Contrato cancelado não pode ser editado.');
+        }
+
+        $contrato->update($dados);
+
+        return $contrato->fresh(['itens']);
+    }
+
+    public function excluir(int $id)
+    {
+        $contrato = $this->repository->find($id);
+
+        // DB já impede se houver FK, mas o delete cascade apaga itens
+        return $contrato->delete();
+    }
+
+    public function calcularTotal(int $id): array
+    {
+        $contrato = $this->repository->find($id);
         return $this->calculadora->calcular($contrato);
+    }
+
+    public function adicionarItem(int $id, array $dados)
+    {
+        $contrato = $this->repository->find($id);
+
+        // Regra PDF: só contrato Ativo recebe itens
+        if ($contrato->status !== 'Ativo') {
+            abort(422, 'Contrato não está ativo');
+        }
+
+        // unique servico por contrato é validado no Request,
+        // mas o DB também tem UNIQUE KEY
+        return DB::transaction(function () use ($contrato, $dados) {
+            return $contrato->itens()->create($dados);
+        });
     }
 }
