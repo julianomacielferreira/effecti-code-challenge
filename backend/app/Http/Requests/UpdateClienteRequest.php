@@ -27,13 +27,10 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Rules\CpfCnpj;
-use App\Models\Cliente;
 use Illuminate\Validation\Rule;
 
 class UpdateClienteRequest extends FormRequest
 {
-
-    private $clienteModel;
 
     public function authorize()
     {
@@ -47,18 +44,22 @@ class UpdateClienteRequest extends FormRequest
 
         return [
             'nome' => ['sometimes', 'string', 'max:255'],
-            'cpf_cnpj' => ['sometimes', 'string', new CpfCnpj(), Rule::unique('clientes')->ignore($this->clienteModel->id)],
-            'email' => ['sometimes', 'email', Rule::unique('clientes')->ignore($id)],
+            'cpf_cnpj' => ['sometimes', 'string', new CpfCnpj(), Rule::unique('clientes', 'cpf_cnpj')->ignore($id)],
+            'email' => ['sometimes', 'email', Rule::unique('clientes', 'email')->ignore($id)],
             'status' => ['sometimes', 'in:Ativo,Inativo'],
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'cpf_cnpj.unique' => 'Cliente já cadastrado.',
+            'email.unique' => 'Email já cadastrado.',
         ];
     }
 
     protected function prepareForValidation()
     {
-
-        $id = $this->route('cliente');
-
-        $this->clienteModel = Cliente::findOrFail($id);
 
         if ($this->cpf_cnpj) {
             $this->merge(

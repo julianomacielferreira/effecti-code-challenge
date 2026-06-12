@@ -54,7 +54,7 @@ class ClienteControllerTest extends TestCase
         $response = $this->postJson('/api/clientes', [
             'nome' => 'MLOCKS CONSULTORIA',
             'cpf_cnpj' => '52998224725',
-            'email' => 'a@a.com'
+            'email' => 'mlocks@email.com'
         ])->assertCreated();
 
         $this->assertDatabaseHas('clientes', ['cpf_cnpj' => '52998224725']);
@@ -63,13 +63,13 @@ class ClienteControllerTest extends TestCase
     /** @test */
     public function nao_cria_duplicado()
     {
-        Cliente::create(['nome' => 'X', 'cpf_cnpj' => '52998224725', 'email' => 'x@x.com']);
+        Cliente::create(['nome' => 'MLOCKS CONSULTORIA', 'cpf_cnpj' => '52998224725', 'email' => 'mlocks@email.com']);
 
         $this->postJson('/api/clientes', [
-            'nome' => 'Y',
+            'nome' => 'Oficina',
             'cpf_cnpj' => '529.982.247-25',
-            'email' => 'y@y.com'
-        ])->assertStatus(422)->assertJsonValidationErrors('cpf_cnpj');
+            'email' => 'mlocks@email.com'
+        ])->assertStatus(422)->assertJson(['message' => 'Este CPF/CNPJ já está cadastrado.']);
     }
 
     /** @test */
@@ -85,9 +85,9 @@ class ClienteControllerTest extends TestCase
     {
         $cliente = Cliente::factory()->create();
 
-        $this->putJson("/api/clientes/{$cliente->id}", ['nome' => 'Novo'])->assertOk();
+        $this->putJson("/api/clientes/{$cliente->id}", ['nome' => 'MLOCKS CONSULTORIA'])->assertOk();
 
-        $this->assertDatabaseHas('clientes', ['nome' => 'Novo']);
+        $this->assertDatabaseHas('clientes', ['nome' => 'MLOCKS CONSULTORIA']);
     }
 
     /** @test */

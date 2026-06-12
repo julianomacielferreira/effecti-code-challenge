@@ -154,6 +154,8 @@ class ServicoController extends Controller
      */
     public function update(UpdateServicoRequest $request, int $id)
     {
+        $this->service->buscar((int)$id); // força 404
+
         $servico = $this->service->atualizar($id, $request->validated());
 
         return response()->json($servico);

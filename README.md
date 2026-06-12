@@ -133,7 +133,7 @@ $ docker-compose exec backend php artisan test
 A saída será similar a essa:
 
 ```bash
-   PASS  Tests\Unit\Models\ClienteTest
+      PASS  Tests\Unit\Models\ClienteTest
   ✓ status padrao e ativo
   ✓ relacionamento contratos retorna has many
 
@@ -211,7 +211,8 @@ A saída será similar a essa:
   ✓ nao deleta em uso
 
   Tests:  51 passed
-  Time:   0.91s
+  Time:   0.92s
+
 ```
 
 ## Documentação Swagger

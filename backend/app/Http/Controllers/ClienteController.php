@@ -98,6 +98,8 @@ class ClienteController extends Controller
      */
     public function update(UpdateClienteRequest $request, int $id)
     {
+        $this->service->buscar((int)$id); // força 404
+        
         $cliente = $this->service->atualizar($id, $request->validated());
 
         return response()->json($cliente);
