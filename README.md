@@ -383,6 +383,8 @@ Para acessar documentação Swagger basta acessar http://localhost:8000/api/docu
 
 ## Endpoints
 
+Uma coleção de endpoints do Postman está localizada no arquivo [Effecti ERP.postman_collection.json](./Effecti ERP.postman_collection.json) e abaixo estão exemplos de chamadas cURL para os endpoints.
+
 ### Clientes - Listar com filtro (GET): 
 
 - **api/clientes?status={{Ativo|Inativo}}&search={{search}}**

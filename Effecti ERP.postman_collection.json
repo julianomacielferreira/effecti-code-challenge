@@ -1,0 +1,485 @@
+{
+  "info": {
+    "_postman_id": "ee5b4845-8d98-412e-9a7d-8e9fecfacf19",
+    "name": "Effecti ERP",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "46564992",
+    "_collection_link": "https://go.postman.co/collection/46564992-ee5b4845-8d98-412e-9a7d-8e9fecfacf19?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Clientes",
+      "item": [
+        {
+          "name": "Criar cliente",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"nome\": \"MLOCKS CONSULTORIA {{$randomAbbreviation}}\",\n    \"cpf_cnpj\": \"11.222.333/0001-81\",\n    \"email\": \"contato@email.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/api/clientes",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "clientes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar cliente",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"Inativo\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/api/clientes/36",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "clientes",
+                "36"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar cliente",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8000/api/clientes/35",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "clientes",
+                "35"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar clientes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8000/api/clientes?status=Ativo&search=MLOCKS",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "clientes"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "Ativo"
+                },
+                {
+                  "key": "search",
+                  "value": "MLOCKS"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Serviços",
+      "item": [
+        {
+          "name": "Deletar serviço",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8000/api/servicos/10",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "servicos",
+                "10"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar serviço",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"nome\": \"Oficina Mecânica {{$randomAbbreviation}}\",\n    // \"nome\": \"Oficina Mecânica SQL\",\n    \"valor_base_mensal\": {{$randomPrice}}\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8000/api/servicos/10",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "servicos",
+                "10"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Criar Serviço",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"nome\": \"Oficina Mecânica {{$randomAbbreviation}}\",\n    // \"nome\": \"Oficina\",\n    \"valor_base_mensal\": {{$randomPrice}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/api/servicos",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "servicos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Listar Servicos",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8000/api/servicos?search=Oficina",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "servicos"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "Oficina"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Contratos",
+      "item": [
+        {
+          "name": "Lista contratos",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8000/api/contratos",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "contratos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Criar contrato",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"cliente_id\": 60,\n    \"data_inicio\": \"2026-06-12\",\n    \"status\": \"Ativo\"\n  }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/api/contratos",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "contratos"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Carregar contrato",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8000/api/contratos/26",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "contratos",
+                "26"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Atualizar contrato",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"Cancelado\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/api/contratos/26",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "contratos",
+                "26"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Deletar contrato",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:8000/api/contratos/26",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "contratos",
+                "26"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Adicionar item ao contrato",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"servico_id\": 20,\n    \"quantidade\": 10,\n    \"valor_unitario\": 100.00\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:8000/api/contratos/26/itens",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8000",
+              "path": [
+                "api",
+                "contratos",
+                "26",
+                "itens"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
