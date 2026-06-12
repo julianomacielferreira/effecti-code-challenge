@@ -3,7 +3,14 @@
 Desenvolvimento de um ERP simplificado focado em Contratos e Serviços recorrentes.
 O projeto é monorepo com backend e frontend separados, roda no Docker utilizando as tecnologias Laravel (API REST) em PHP 8.2 + Vue.js 3 e MySQL.
 
-#### O backend roda em http://localhost:8000/ e o frontend roda em http://localhost:5173/
+Veja mais abaixo as instruções para configurar e rodar o projeto.
+
+## URLs principais
+
+#### Backend: http://localhost:8000/ 
+#### Frontend: http://localhost:5173/
+#### Swagger docs da API: http://localhost:8000/api/documentation
+
 
 ## Stack
 
