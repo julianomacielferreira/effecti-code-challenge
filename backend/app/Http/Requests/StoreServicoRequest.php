@@ -46,9 +46,10 @@ class StoreServicoRequest extends FormRequest
     public function messages()
     {
         return [
-            'nome.unique' => 'Este Serviço já está cadastrado.',
-            'nome.required' => 'Nome é obrigatório.',
-            'valor_base_mensal.min' => 'Valor deve ser maior que zero.'
+            'nome.required' => 'Nome é obrigatório',
+            'nome.unique'   => 'Este Serviço já está cadastrado.',
+            'valor_base_mensal.required' => 'Valor é obrigatório',
+            'valor_base_mensal.min' => 'Valor deve ser maior que zero',
         ];
     }
 }

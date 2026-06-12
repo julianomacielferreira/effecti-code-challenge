@@ -49,7 +49,10 @@ class StoreClienteRequest extends FormRequest
     public function messages()
     {
         return [
+            'nome.required' => 'Nome é obrigatório',
+            'cpf_cnpj.required' => 'CPF/CNPJ é obrigatório',
             'cpf_cnpj.unique' => 'Este CPF/CNPJ já está cadastrado.',
+            'email.email'       => 'Email inválido',
         ];
     }
 

@@ -27,9 +27,13 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use App\Models\Servico;
 
 class UpdateServicoRequest extends FormRequest
 {
+
+    private $servicoModel;
+
     public function authorize()
     {
         // Em produção usar Auth::user()->can()
@@ -42,7 +46,7 @@ class UpdateServicoRequest extends FormRequest
         $id = $this->route('servico');
 
         return [
-            'nome' => ['sometimes', 'string', 'max:255', Rule::unique('servicos')->ignore($id)],
+            'nome' => ['sometimes', 'string', 'max:255', Rule::unique('servicos', 'nome')->ignore($this->servicoModel->id)],
             'valor_base_mensal' => ['sometimes', 'required', 'numeric', 'min:0.01'],
         ];
     }
@@ -52,5 +56,11 @@ class UpdateServicoRequest extends FormRequest
         return [
             'nome.unique' => 'Este Serviço já está cadastrado.',
         ];
+    }
+
+    protected function prepareForValidation()
+    {
+        $id = $this->route('servico');
+        $this->servicoModel = Servico::findOrFail($id);
     }
 }
