@@ -50,35 +50,35 @@ class ClienteRepositoryTest extends TestCase
         $cliente = $this->repo->create([
             'nome' => 'MLOCKS CONSULTORIA',
             'cpf_cnpj' => '529.982.247-25',
-            'email' => 'contato@email.com',
+            'email' => 'mlocks@email.com',
         ]);
 
         $this->assertEquals('52998224725', $cliente->cpf_cnpj);
-        $this->assertDatabaseHas('clientes', ['email' => 'contato@email.com']);
+        $this->assertDatabaseHas('clientes', ['email' => 'mlocks@email.com']);
     }
 
     /** @test */
     public function busca_por_cpf_ignorando_mascara()
     {
         $this->repo->create([
-            'nome' => 'Teste',
+            'nome' => 'MLOCKS CONSULTORIA',
             'cpf_cnpj' => '11222333000181',
-            'email' => 't@teste.com',
+            'email' => 'mlocks@email.com',
         ]);
 
         $found = $this->repo->findByCpfCnpj('11.222.333/0001-81');
 
         $this->assertNotNull($found);
-        $this->assertEquals('Teste', $found->nome);
+        $this->assertEquals('MLOCKS CONSULTORIA', $found->nome);
     }
 
     /** @test */
     public function nao_deleta_cliente_com_contrato_ativo()
     {
         $cliente = $this->repo->create([
-            'nome' => 'Com Contrato',
+            'nome' => 'MLOCKS CONSULTORIA',
             'cpf_cnpj' => '12345678901',
-            'email' => 'c@teste.com',
+            'email' => 'mlocks@email.com',
         ]);
 
         // cria contrato para travar
@@ -98,9 +98,9 @@ class ClienteRepositoryTest extends TestCase
     public function deleta_cliente_sem_contrato()
     {
         $cliente = $this->repo->create([
-            'nome' => 'Livre',
+            'nome' => 'MLOCKS CONSULTORIA',
             'cpf_cnpj' => '98765432100',
-            'email' => 'l@teste.com',
+            'email' => 'mlocks@email.com',
         ]);
 
         $this->assertTrue($this->repo->delete($cliente));
