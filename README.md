@@ -91,7 +91,7 @@ Foi utilizado o padrão `Strategy` na classe `App\Services\CalculadoraDeContrato
 
 Cada regra recebe o Contrato e devolve um novo valor total. A Calculadora só soma os resultados — ela não sabe como cada desconto funciona.
 
-Para adicionar uma nova regra que cria um desconto de aniversário você pode seguir o seguinte exemplo:
+Por exemplo, para adicionar uma nova regra que cria um desconto de aniversário você pode seguir o seguinte exemplo:
 
 1. Crie uma nova classe Rule no arquivo `app/Rules/Contrato/DescontoAniversarioRule.php`
 
