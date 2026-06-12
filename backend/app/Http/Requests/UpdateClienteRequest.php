@@ -33,11 +33,14 @@ class UpdateClienteRequest extends FormRequest
 {
     public function authorize()
     {
+        // Em produção usar Auth::user()->can()
         return true;
     }
+
     public function rules()
     {
         $id = $this->route('cliente');
+
         return [
             'nome' => ['sometimes', 'string', 'max:255'],
             'cpf_cnpj' => ['sometimes', 'string', new CpfCnpj(), Rule::unique('clientes')->ignore($id)],
@@ -45,8 +48,14 @@ class UpdateClienteRequest extends FormRequest
             'status' => ['sometimes', 'in:Ativo,Inativo'],
         ];
     }
+
     protected function prepareForValidation()
     {
-        if ($this->cpf_cnpj) $this->merge(['cpf_cnpj' => preg_replace('/\D/', '', $this->cpf_cnpj)]);
+        if ($this->cpf_cnpj)
+            $this->merge(
+                [
+                    'cpf_cnpj' => preg_replace('/\D/', '', $this->cpf_cnpj)
+                ]
+            );
     }
 }
