@@ -124,8 +124,13 @@ class DescontoAniversarioRule implements ContratoRule
 /** @test */
 public function aplica_10_porcento_no_mes_aniversario()
 {
-    $contrato = Contrato::factory()->create();
     $regra = new DescontoAniversarioRule();
+    $contrato = Contrato::factory()->create();
+    $contrato->setRelation('itens', collect([
+        $this->item('Básico', 1, 100),
+        $this->item('Standard', 1, 50),
+    ]));
+
     $this->assertEquals(-$contrato->valor_total*0.1, $regra->aplicar($contrato));
 }
 ```
