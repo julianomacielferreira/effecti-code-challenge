@@ -282,7 +282,7 @@ function validarCpfCnpj() {
 
   if (value.length === 14) {
 
-    const isValid = validarCNPJ(v);
+    const isValid = validarCNPJ(value);
 
     errors.value.cpf_cnpj = isValid ? '' : 'CNPJ inválido';
 
