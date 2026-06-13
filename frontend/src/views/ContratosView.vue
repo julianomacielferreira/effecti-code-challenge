@@ -44,9 +44,11 @@
             <th class="p-3">ID</th>
             <th>Cliente</th>
             <th>Início</th>
+            <th>Fim</th>
             <th>Status</th>
             <th>Valor Total</th>
             <th>Itens</th>
+            <th>Última Atualização</th>
             <th>Ações</th>
           </tr>
         </thead>
@@ -54,7 +56,8 @@
           <tr v-for="contrato in contratos" :key="contrato.id" class="border-t hover:bg-gray-50">
             <td class="p-3">{{ contrato.id }}</td>
             <td>{{ contrato.cliente?.nome || contrato.cliente_id }}</td>
-            <td>{{ contrato.data_inicio }}</td>
+            <td>{{ formatDate(contrato.data_inicio) }}</td>
+            <td>{{ formatDate(contrato.data_termino) }}</td>
             <td>{{ contrato.status }}</td>
             <td>R$ {{ calcularTotal(contrato).toFixed(2) }}</td>
             <td>
@@ -62,6 +65,7 @@
                 {{ contrato.itens?.length || 0 }}
               </span>
             </td>
+            <td>{{ formatDate(contrato.updated_at) }}</td>
             <td class="space-x-2">
               <router-link :to="`/contratos/${contrato.id}`" class="text-blue-600 text-sm">Ver</router-link>
               <button @click="toggleStatus(contrato)" class="text-sm text-amber-600">
@@ -110,6 +114,15 @@ const showForm = ref(false);
 const form = ref({ cliente_id: '', data_inicio: new Date().toISOString().slice(0, 10), status: 'Ativo' });
 const errors = ref({ cliente: '', data: '' });
 const apiError = ref('');
+
+function formatDate(dateString) {
+
+  if (!dateString) {
+    return '-';
+  }
+
+  return new Date(dateString).toLocaleDateString('pt-BR');
+}
 
 function validarForm() {
 
