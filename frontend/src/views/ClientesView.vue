@@ -2,7 +2,7 @@
   <div>
     <div class="flex justify-between items-center mb-6">
       <h2 class="text-2xl font-bold">Clientes</h2>
-      <button @click="abrirNovo" class="bg-slate-900 text-white px-4 py-2 rounded">
+      <button @click="abrirNovo" class="bg-slate-900 text-white px-4 py-2 rounded hover:bg-slate-800 transition-colors">
         {{ showForm ? 'Cancelar' : 'Novo Cliente' }}
       </button>
     </div>
@@ -17,23 +17,27 @@
       <form @submit.prevent="salvar" class="grid grid-cols-1 md:grid-cols-4 gap-3">
         <div>
           <input v-model="form.nome" @input="apiError = ''" placeholder="Nome" required
-            class="border p-2 rounded w-full" :class="{ 'border-red-500': errors.nome }" />
+            class="border p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-cyan-600"
+            :class="{ 'border-red-500': errors.nome }" />
           <p v-if="errors.nome" class="text-red-600 text-xs mt-1">{{ errors.nome }}</p>
         </div>
 
         <div>
           <input v-model="form.cpf_cnpj" @input="onCpfCnpjInput" placeholder="CPF ou CNPJ" required maxlength="18"
-            class="border p-2 rounded w-full" :class="{ 'border-red-500': errors.cpf_cnpj }" />
+            class="border p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-cyan-600"
+            :class="{ 'border-red-500': errors.cpf_cnpj }" />
           <p v-if="errors.cpf_cnpj" class="text-red-600 text-xs mt-1">{{ errors.cpf_cnpj }}</p>
         </div>
 
         <div>
           <input v-model="form.email" @blur="validarEmail" @input="apiError = ''" type="email" placeholder="Email"
-            required class="border p-2 rounded w-full" :class="{ 'border-red-500': errors.email }" />
+            required class="border p-2 rounded w-full focus:outline-none focus:ring-2 focus:ring-cyan-600"
+            :class="{ 'border-red-500': errors.email }" />
           <p v-if="errors.email" class="text-red-600 text-xs mt-1">{{ errors.email }}</p>
         </div>
 
-        <button :disabled="!formValido" class="bg-cyan-600 text-white rounded px-4 disabled:opacity-50">
+        <button :disabled="!formValido"
+          class="bg-cyan-600 text-white rounded px-4 hover:bg-cyan-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
           {{ editandoId ? 'Atualizar' : 'Salvar' }}
         </button>
       </form>
@@ -41,8 +45,9 @@
 
     <div class="flex gap-3 mb-4">
       <input v-model="filtros.search" @input="carregar" placeholder="Buscar por nome..."
-        class="border p-2 rounded flex-1" />
-      <select v-model="filtros.status" @change="carregar" class="border p-2 rounded">
+        class="border p-2 rounded flex-1 focus:outline-none focus:ring-2 focus:ring-slate-300" />
+      <select v-model="filtros.status" @change="carregar"
+        class="border p-2 rounded focus:outline-none focus:ring-2 focus:ring-slate-300">
         <option value="">Todos</option>
         <option value="Ativo">Ativo</option>
         <option value="Inativo">Inativo</option>
@@ -53,31 +58,42 @@
       <table class="w-full">
         <thead class="bg-gray-100 text-left">
           <tr>
-            <th class="p-3">ID</th>
-            <th>Nome</th>
-            <th>CPF/CNPJ</th>
-            <th>Email</th>
-            <th>Status</th>
-            <th>Ações</th>
+            <th class="p-3 font-semibold">ID</th>
+            <th class="font-semibold">Nome</th>
+            <th class="font-semibold">CPF/CNPJ</th>
+            <th class="font-semibold">Email</th>
+            <th class="font-semibold">Status</th>
+            <th class="font-semibold">Ações</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="cliente in clientes" :key="cliente.id" class="border-t">
+          <tr v-if="clientes.length === 0">
+            <td colspan="6" class="p-6 text-center text-gray-500">
+              Nenhum cliente encontrado.
+            </td>
+          </tr>
+
+          <tr v-for="cliente in clientes" :key="cliente.id" class="border-t hover:bg-gray-50 transition-colors">
             <td class="p-3">{{ cliente.id }}</td>
             <td>{{ cliente.nome }}</td>
-            <td>{{ cliente.cpf_cnpj }}</td>
+            <td>{{ DocumentFormatter.maskCpfCnpj(cliente.cpf_cnpj) }}</td>
             <td>{{ cliente.email }}</td>
             <td>
-              <span :class="cliente.status === 'Ativo' ? 'text-green-600' : 'text-red-600'">
+              <span class="px-2 py-1 rounded text-xs font-medium"
+                :class="cliente.status === 'Ativo' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'">
                 {{ cliente.status || 'Ativo' }}
               </span>
             </td>
             <td class="space-x-3">
-              <button @click="editar(cliente)" class="text-sm text-blue-600">Editar</button>
-              <button @click="toggleStatus(cliente)" class="text-sm text-amber-600">
+              <button @click="editar(cliente)" class="text-sm text-blue-600 hover:underline">
+                Editar
+              </button>
+              <button @click="toggleStatus(cliente)" class="text-sm text-amber-600 hover:underline">
                 {{ cliente.status === 'Ativo' ? 'Inativar' : 'Ativar' }}
               </button>
-              <button @click="remover(cliente.id)" class="text-sm text-red-600">Excluir</button>
+              <button @click="remover(cliente.id)" class="text-sm text-red-600 hover:underline">
+                Excluir
+              </button>
             </td>
           </tr>
         </tbody>
@@ -86,7 +102,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 /*
  * The MIT License
  *
@@ -110,342 +126,227 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, Ref } from 'vue';
+import { StringUtils } from '../utils/StringUtils';
+import { DocumentFormatter } from '../utils/DocumentFormatter';
+import { EmailValidator } from '../utils/EmailValidator';
+import { DocumentValidatorFactory } from '../utils/validators/DocumentValidatorFactory';
 import API from '../services/api';
 
-const clientes = ref([]);
-const showForm = ref(false);
-const editandoId = ref(null);
-const form = ref({ nome: '', cpf_cnpj: '', email: '' });
-const filtros = ref({ search: '', status: '' });
-const errors = ref({ nome: '', cpf_cnpj: '', email: '' });
-const apiError = ref('');
-
-const onlyDigits = (value) => value.replace(/\D/g, '');
-
-function maskCpfCnpj(value) {
-
-  const digitos = onlyDigits(value);
-
-  if (digitos.length <= 11) {
-
-    return digitos.replace(/(\d{3})(\d)/, '$1.$2')
-      .replace(/(\d{3})(\d)/, '$1.$2')
-      .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-
-  }
-
-  return digitos.replace(/^(\d{2})(\d)/, '$1.$2')
-    .replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3')
-    .replace(/\.(\d{3})(\d)/, '.$1/$2')
-    .replace(/(\d{4})(\d)/, '$1-$2');
+interface ICliente {
+  id: number;
+  nome: string;
+  cpf_cnpj: string;
+  email: string;
+  status: 'Ativo' | 'Inativo';
 }
 
-function onCpfCnpjInput(element) {
-
-  form.value.cpf_cnpj = maskCpfCnpj(element.target.value);
-
-  validarCpfCnpj();
+interface IClienteForm {
+  nome: string;
+  cpf_cnpj: string;
+  email: string;
 }
 
-function validarCPF(CPF) {
-
-  const cpfSemMascara = onlyDigits(CPF);
-
-  const possuiTamanhoValido = cpfSemMascara.length === 11;
-
-  const todosDigitosIguais = /^(\d)\1+$/.test(cpfSemMascara);
-
-  if (!possuiTamanhoValido || todosDigitosIguais) {
-    return false;
-  }
-
-  let somaPrimeiroDigitoVerificador = 0;
-
-  for (let indiceDigito = 0; indiceDigito < 9; indiceDigito++) {
-
-    const digitoAtual = parseInt(cpfSemMascara[indiceDigito]);
-
-    const pesoAtual = 10 - indiceDigito;
-
-    somaPrimeiroDigitoVerificador += digitoAtual * pesoAtual;
-  }
-
-  let primeiroDigitoCalculado = 11 - (somaPrimeiroDigitoVerificador % 11);
-
-  if (primeiroDigitoCalculado > 9) {
-    primeiroDigitoCalculado = 0;
-  }
-
-  const primeiroDigitoInformado = parseInt(cpfSemMascara[9]);
-
-  if (primeiroDigitoCalculado !== primeiroDigitoInformado) {
-    return false;
-  }
-
-  let somaSegundoDigitoVerificador = 0;
-
-  for (let indiceDigito = 0; indiceDigito < 10; indiceDigito++) {
-
-    const digitoAtual = parseInt(cpfSemMascara[indiceDigito]);
-
-    const pesoAtual = 11 - indiceDigito;
-
-    somaSegundoDigitoVerificador += digitoAtual * pesoAtual;
-  }
-
-  let segundoDigitoCalculado = 11 - (somaSegundoDigitoVerificador % 11);
-
-  if (segundoDigitoCalculado > 9) {
-    segundoDigitoCalculado = 0;
-  }
-
-  const segundoDigitoInformado = parseInt(cpfSemMascara[10]);
-
-  return (segundoDigitoCalculado === segundoDigitoInformado);
+interface IFiltros {
+  search: string;
+  status: string;
 }
 
-function validarCNPJ(CNPJ) {
+interface IFormErros {
+  nome: string;
+  cpf_cnpj: string;
+  email: string;
+}
 
-  const cnpjSemMascara = onlyDigits(CNPJ);
+class ClienteViewModel {
 
-  const possuiTamanhoValido = cnpjSemMascara.length === 14;
+  public clientes: Ref<ICliente[]> = ref([]);
+  public showForm: Ref<boolean> = ref(false);
+  public editandoId: Ref<number | null> = ref(null);
+  public form: Ref<IClienteForm> = ref({ nome: '', cpf_cnpj: '', email: '' });
+  public filtros: Ref<IFiltros> = ref({ search: '', status: '' });
+  public errors: Ref<IFormErros> = ref({ nome: '', cpf_cnpj: '', email: '' });
+  public apiError: Ref<string> = ref('');
 
-  const todosDigitosIguais = /^(\d)\1+$/.test(cnpjSemMascara);
+  public get formValido() {
 
-  if (!possuiTamanhoValido || todosDigitosIguais) {
-    return false;
+    return computed(() => {
+      return (
+        this.form.value.nome.length > 2 &&
+        !this.errors.value.cpf_cnpj &&
+        !this.errors.value.email &&
+        StringUtils.onlyDigits(this.form.value.cpf_cnpj).length >= 11
+      );
+    });
   }
 
-  function calcularDigitoVerificador(quantidadeDigitosBase) {
+  public onCpfCnpjInput = (event: Event): void => {
 
-    const pesosPrimeiroDigito = [
-      5, 4, 3, 2,
-      9, 8, 7, 6,
-      5, 4, 3, 2
-    ];
+    const target = event.target as HTMLInputElement;
 
-    const pesosSegundoDigito = [
-      6, 5, 4, 3,
-      2, 9, 8, 7,
-      6, 5, 4, 3, 2
-    ];
+    this.form.value.cpf_cnpj = DocumentFormatter.maskCpfCnpj(target.value);
 
-    const pesosUtilizados = quantidadeDigitosBase === 12 ? pesosPrimeiroDigito : pesosSegundoDigito;
+    this.validarCpfCnpj();
+  };
 
-    let somaPonderada = 0;
+  public validarCpfCnpj = (): boolean => {
 
-    for (let indiceDigito = 0; indiceDigito < pesosUtilizados.length; indiceDigito++) {
+    const value = StringUtils.onlyDigits(this.form.value.cpf_cnpj);
 
-      const digitoAtual = parseInt(cnpjSemMascara[indiceDigito]);
-
-      const pesoAtual = pesosUtilizados[indiceDigito];
-
-      somaPonderada += digitoAtual * pesoAtual;
+    if (!value) {
+      this.errors.value.cpf_cnpj = 'Obrigatório';
+      return false;
     }
 
-    const restoDaDivisao = somaPonderada % 11;
+    const validator = DocumentValidatorFactory.getValidator(value);
 
-    if (restoDaDivisao < 2) {
-      return 0;
+    if (!validator) {
+      this.errors.value.cpf_cnpj = 'Digite 11 dígitos (CPF) ou 14 (CNPJ)';
+      return false;
     }
 
-    return 11 - restoDaDivisao;
-  }
+    const isValid = validator.isValid(value);
 
-  const primeiroDigitoCalculado = calcularDigitoVerificador(12);
-
-  const primeiroDigitoInformado = parseInt(cnpjSemMascara[12]);
-
-  const segundoDigitoCalculado = calcularDigitoVerificador(13);
-
-  const segundoDigitoInformado = parseInt(cnpjSemMascara[13]);
-
-  return (primeiroDigitoCalculado === primeiroDigitoInformado && segundoDigitoCalculado === segundoDigitoInformado);
-}
-
-function validarCpfCnpj() {
-
-  const value = onlyDigits(form.value.cpf_cnpj);
-
-  if (!value) {
-
-    errors.value.cpf_cnpj = 'Obrigatório';
-
-    return false;
-  }
-
-  if (value.length === 11) {
-
-    const isValid = validarCPF(value);
-
-    errors.value.cpf_cnpj = isValid ? '' : 'CPF inválido';
+    this.errors.value.cpf_cnpj = isValid
+      ? ''
+      : (value.length === 11 ? 'CPF inválido' : 'CNPJ inválido');
 
     return isValid;
-  }
+  };
 
-  if (value.length === 14) {
+  public validarEmail = (): boolean => {
 
-    const isValid = validarCNPJ(value);
+    const isValid = EmailValidator.isValid(this.form.value.email);
 
-    errors.value.cpf_cnpj = isValid ? '' : 'CNPJ inválido';
+    this.errors.value.email = isValid ? '' : 'Email inválido';
 
     return isValid;
-  }
+  };
 
-  errors.value.cpf_cnpj = 'Digite 11 dígitos (CPF) ou 14 (CNPJ)';
+  private handleApiError = (error: any): void => {
 
-  return false;
-}
+    const msg = error.response?.data?.message || 'Erro ao processar requisição';
 
-function validarEmail() {
+    this.apiError.value = msg;
 
-  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const lower = msg.toLowerCase();
 
-  const isValid = regex.test(form.value.email);
+    if (lower.includes('cpf') || lower.includes('cnpj')) {
+      this.errors.value.cpf_cnpj = msg;
+    } else if (lower.includes('email')) {
+      this.errors.value.email = msg;
+    } else if (lower.includes('nome')) {
+      this.errors.value.nome = msg;
+    }
+  };
 
-  errors.value.email = isValid ? '' : 'Email inválido';
+  public abrirNovo = (): void => {
 
-  return isValid;
-}
+    this.editandoId.value = null;
 
-const formValido = computed(() => {
+    this.resetForm();
 
-  return form.value.nome.length > 2 &&
-    !errors.value.cpf_cnpj &&
-    !errors.value.email &&
-    onlyDigits(form.value.cpf_cnpj).length >= 11;
-});
+    this.showForm.value = !this.showForm.value;
+  };
 
-function handleApiError(error) {
+  public editar = (cliente: ICliente): void => {
 
-  const msg = error.response?.data?.message || 'Erro ao processar requisição';
+    this.editandoId.value = cliente.id;
 
-  apiError.value = msg;
+    this.form.value = {
+      nome: cliente.nome,
+      cpf_cnpj: DocumentFormatter.maskCpfCnpj(cliente.cpf_cnpj),
+      email: cliente.email
+    };
 
-  const lower = msg.toLowerCase();
+    this.resetErrors();
 
-  if (lower.includes('cpf') || lower.includes('cnpj')) {
+    this.showForm.value = true;
 
-    errors.value.cpf_cnpj = msg;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
-  } else if (lower.includes('email')) {
+  private resetForm = (): void => {
+    this.form.value = { nome: '', cpf_cnpj: '', email: '' };
+    this.resetErrors();
+  };
 
-    errors.value.email = msg;
+  private resetErrors = (): void => {
+    this.errors.value = { nome: '', cpf_cnpj: '', email: '' };
+    this.apiError.value = '';
+  };
 
-  } else if (lower.includes('nome')) {
+  public carregar = async (): Promise<void> => {
+    try {
+      const { data } = await API.getClientes(this.filtros.value);
+      this.clientes.value = Array.isArray(data) ? data : data.data || [];
+    } catch (e) {
+      this.handleApiError(e);
+    }
+  };
 
-    errors.value.nome = msg;
-  }
-}
+  public salvar = async (): Promise<void> => {
 
-function abrirNovo() {
+    this.apiError.value = '';
 
-  editandoId.value = null;
+    this.errors.value.nome = this.form.value.nome.length < 3 ? 'Mínimo 3 caracteres' : '';
 
-  form.value = { nome: '', cpf_cnpj: '', email: '' };
-
-  errors.value = { nome: '', cpf_cnpj: '', email: '' };
-
-  apiError.value = '';
-
-  showForm.value = !showForm.value;
-}
-
-function editar(cliente) {
-
-  editandoId.value = cliente.id;
-
-  form.value = { nome: cliente.nome, cpf_cnpj: maskCpfCnpj(cliente.cpf_cnpj), email: cliente.email };
-
-  errors.value = { nome: '', cpf_cnpj: '', email: '' };
-
-  apiError.value = '';
-
-  showForm.value = true;
-
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-async function carregar() {
-
-  try {
-
-    const { data } = await API.getClientes(filtros.value);
-
-    clientes.value = Array.isArray(data) ? data : data.data || [];
-
-  } catch (e) {
-
-    handleApiError(e);
-
-  }
-}
-
-async function salvar() {
-
-  apiError.value = '';
-
-  errors.value.nome = form.value.nome.length < 3 ? 'Mínimo 3 caracteres' : '';
-
-  if (!validarCpfCnpj() || !validarEmail() || errors.value.nome) {
-    return;
-  }
-
-  try {
-
-    if (editandoId.value) {
-      await API.updateCliente(editandoId.value, form.value);
-    } else {
-      await API.createCliente(form.value);
+    if (!this.validarCpfCnpj() || !this.validarEmail() || this.errors.value.nome) {
+      return;
     }
 
-    showForm.value = false; editandoId.value = null;
+    try {
+      if (this.editandoId.value) {
+        await API.updateCliente(this.editandoId.value, this.form.value);
+      } else {
+        await API.createCliente(this.form.value);
+      }
 
-    form.value = { nome: '', cpf_cnpj: '', email: '' };
+      this.showForm.value = false;
+      this.editandoId.value = null;
+      this.resetForm();
 
-    carregar();
+      await this.carregar();
 
-  } catch (e) {
+    } catch (e) {
+      this.handleApiError(e);
+    }
+  };
 
-    handleApiError(e);
+  public toggleStatus = async (cliente: ICliente): Promise<void> => {
+    try {
 
-  }
+      const novoStatus = cliente.status === 'Ativo' ? 'Inativo' : 'Ativo';
+
+      await API.updateCliente(cliente.id, { status: novoStatus });
+
+      await this.carregar();
+
+    } catch (e) {
+      this.handleApiError(e);
+    }
+  };
+
+  public remover = async (id: number): Promise<void> => {
+
+    if (!confirm('Excluir cliente?')) return;
+
+    try {
+      await API.deleteCliente(id);
+      await this.carregar();
+    } catch (e) {
+      this.handleApiError(e);
+    }
+  };
 }
 
-async function toggleStatus(cliente) {
+const clienteViewModel = new ClienteViewModel();
 
-  try {
+const { clientes, showForm, editandoId, form, errors, apiError, filtros, formValido } = clienteViewModel;
 
-    const novo = cliente.status === 'Ativo' ? 'Inativo' : 'Ativo';
-
-    await API.updateCliente(cliente.id, { status: novo });
-
-    carregar();
-
-  } catch (e) {
-    handleApiError(e);
-  }
-}
-
-async function remover(id) {
-
-  if (!confirm('Excluir cliente?')) {
-    return;
-  }
-
-  try {
-
-    await API.deleteCliente(id);
-
-    carregar();
-
-  } catch (e) {
-
-    handleApiError(e);
-  }
-
-}
+const { onCpfCnpjInput, validarEmail, abrirNovo, editar, carregar, salvar, toggleStatus, remover } = clienteViewModel;
 
 onMounted(carregar);
+
+defineExpose({ DocumentFormatter });
 </script>
