@@ -21,12 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-import { defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue';
+import { createApp } from 'vue';
+import App from './App.vue';
+import router from './router';
 
-export default defineConfig({
-  plugins: [vue()],
-  server: {
-    port: 5173
-  }
-});
+createApp(App).use(router).mount('#app');
