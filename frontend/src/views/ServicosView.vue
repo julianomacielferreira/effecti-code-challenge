@@ -93,23 +93,8 @@
 import { ref, onMounted, computed, Ref } from 'vue';
 import { CurrencyUtils } from '../utils/CurrencyUtils';
 import { ApiHelper } from '../utils/ApiHelper';
+import { IServico, IServicoErrors, IServicoForm } from '../models/Servico';
 import API from '../services/api';
-
-interface IServico {
-  id: number;
-  nome: string;
-  valor_base_mensal: number;
-}
-
-interface IServicoForm {
-  nome: string;
-  valor_base_mensal: number | null;
-}
-
-interface IServicoErrors {
-  nome: string;
-  valor: string;
-}
 
 class ServicoViewModel {
 
