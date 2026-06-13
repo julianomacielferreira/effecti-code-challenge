@@ -130,12 +130,14 @@ class ServicoViewModel {
   }
 
   public validarNome = (): boolean => {
+
     const isInvalid = this.form.value.nome.trim().length < 3;
     this.errors.value.nome = isInvalid ? 'Mínimo 3 caracteres' : '';
     return !isInvalid;
   };
 
   public validarValor = (): boolean => {
+
     const value = Number(this.form.value.valor_base_mensal);
     const isInvalid = !value || value <= 0;
     this.errors.value.valor = isInvalid ? 'Valor deve ser maior que zero' : '';
@@ -143,6 +145,7 @@ class ServicoViewModel {
   };
 
   public onValorInput = (event: Event): void => {
+
     const target = event.target as HTMLInputElement;
     const value = CurrencyUtils.parseFromMask(target.value);
 
@@ -151,6 +154,7 @@ class ServicoViewModel {
   };
 
   private handleApiError = (error: any): void => {
+
     ApiHelper.mapErrorToFields(
       error,
       this.errors.value as unknown as Record<string, string>,
@@ -160,11 +164,13 @@ class ServicoViewModel {
   };
 
   public abrirNovo = (): void => {
+
     this.showForm.value = !this.showForm.value;
     if (!this.showForm.value) this.resetForm();
   };
 
   private resetForm = (): void => {
+
     this.form.value = { nome: '', valor_base_mensal: null };
     this.errors.value = { nome: '', valor: '' };
     this.apiError.value = '';
@@ -172,12 +178,14 @@ class ServicoViewModel {
   };
 
   public editar = (servico: IServico): void => {
+
     this.editandoId.value = servico.id;
     this.form.value = { nome: servico.nome, valor_base_mensal: servico.valor_base_mensal };
     this.showForm.value = true;
   };
 
   public carregar = async (): Promise<void> => {
+
     try {
       const { data } = await API.getServicos({ search: this.busca.value });
       this.servicos.value = Array.isArray(data) ? data : data.data || [];
@@ -187,6 +195,7 @@ class ServicoViewModel {
   };
 
   public salvar = async (): Promise<void> => {
+
     this.apiError.value = '';
 
     if (!this.validarNome() || !this.validarValor()) return;
@@ -207,6 +216,7 @@ class ServicoViewModel {
   };
 
   public remover = async (id: number): Promise<void> => {
+
     if (!confirm('Excluir serviço?')) return;
 
     try {

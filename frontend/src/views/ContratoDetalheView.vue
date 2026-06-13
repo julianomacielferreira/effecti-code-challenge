@@ -2,16 +2,16 @@
   <div v-if="contrato">
     <div class="flex justify-between items-center mb-6">
       <h2 class="text-2xl font-bold">Contrato #{{ contrato.id }}</h2>
-      <router-link to="/contratos" class="text-blue-600">← Voltar</router-link>
+      <router-link to="/contratos" class="text-blue-600 hover:underline">← Voltar</router-link>
     </div>
 
     <div class="bg-white p-4 rounded shadow mb-6 grid grid-cols-2 md:grid-cols-6 gap-6">
       <div><strong>Cliente:</strong> {{ contrato.cliente?.nome }}</div>
-      <div><strong>Início:</strong> {{ formatDate(contrato.data_inicio) }}</div>
+      <div><strong>Início:</strong> {{ DateUtils.formatPTBR(contrato.data_inicio) }}</div>
       <div><strong>Status:</strong> {{ contrato.status }}</div>
-      <div><strong>Subtotal:</strong> {{ formatMoney(subtotal) }}</div>
-      <div><strong>Desconto:</strong> {{ formatMoney(desconto_total) }}</div>
-      <div><strong>Total Mensal:</strong> {{ formatMoney(total) }}</div>
+      <div><strong>Subtotal:</strong> {{ CurrencyUtils.formatCurrency(subtotal) }}</div>
+      <div><strong>Desconto:</strong> {{ CurrencyUtils.formatCurrency(desconto_total) }}</div>
+      <div><strong>Total Mensal:</strong> {{ CurrencyUtils.formatCurrency(total) }}</div>
     </div>
 
     <div class="bg-white p-4 rounded shadow">
@@ -22,28 +22,29 @@
       </div>
 
       <form @submit.prevent="adicionarItem" class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
-
-        <select v-model="item.servico_id" @change="onServicoChange" required class="border p-2 rounded">
-          <option value="">Serviço</option>
-          <option v-for="servico in servicos" :key="servico.id" :value="servico.id">
-            {{ servico.nome }} (R$ {{ servico.valor_base_mensal }})
-          </option>
-        </select>
-        <p v-if="errors.servico" class="text-red-600 text-xs mt-1">{{ errors.servico }}</p>
+        <div>
+          <select v-model="item.servico_id" @change="onServicoChange" required class="border p-2 rounded w-full">
+            <option value="">Serviço</option>
+            <option v-for="servico in servicos" :key="servico.id" :value="servico.id">
+              {{ servico.nome }} (R$ {{ CurrencyUtils.formatBRL(servico.valor_base_mensal) }})
+            </option>
+          </select>
+          <p v-if="errors.servico" class="text-red-600 text-xs mt-1">{{ errors.servico }}</p>
+        </div>
 
         <div>
           <input v-model.number="item.quantidade" type="number" min="1" placeholder="Qtd" required
-            class="border p-2 rounded" />
+            class="border p-2 rounded w-full" />
           <p v-if="errors.quantidade" class="text-red-600 text-xs mt-1">{{ errors.quantidade }}</p>
         </div>
 
         <div>
           <input :value="valorItemMask" @input="onValorItemInput" type="text" inputmode="decimal"
-            placeholder="Valor unitário" required class="border p-2 rounded" />
+            placeholder="Valor unitário" required class="border p-2 rounded w-full" />
           <p v-if="errors.valor" class="text-red-600 text-xs mt-1">{{ errors.valor }}</p>
         </div>
 
-        <button class="bg-cyan-600 text-white rounded px-4">Adicionar</button>
+        <button class="bg-cyan-600 text-white rounded px-4 h-[42px]">Adicionar</button>
       </form>
 
       <table class="w-full">
@@ -56,23 +57,30 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="item in contrato.itens || []" :key="item.id" class="border-t">
-            <td class="p-2">{{ item.servico?.nome || item.servico_id }}</td>
-            <td>{{ item.quantidade }}</td>
-            <td>{{ formatMoney(item.valor_unitario) }}</td>
-            <td>{{ formatMoney(item.quantidade * item.valor_unitario) }}</td>
+          <tr v-if="(contrato.itens || []).length === 0">
+            <td colspan="4" class="p-4 text-center text-gray-500">
+              Nenhum item adicionado a este contrato.
+            </td>
+          </tr>
+          <tr v-for="itemObj in contrato.itens || []" :key="itemObj.id" class="border-t">
+            <td class="p-2">{{ itemObj.servico?.nome || itemObj.servico_id }}</td>
+            <td>{{ itemObj.quantidade }}</td>
+            <td>{{ CurrencyUtils.formatCurrency(itemObj.valor_unitario) }}</td>
+            <td>{{ CurrencyUtils.formatCurrency(itemObj.quantidade * itemObj.valor_unitario) }}</td>
           </tr>
         </tbody>
       </table>
 
       <div class="mt-4 p-3 bg-slate-50 rounded">
-        <p class="text-sm text-gray-600">Regras de negócio aplicadas: {{ regras_aplicadas }} </p>
+        <p class="text-sm text-gray-600">
+          <strong>Regras de negócio aplicadas:</strong> {{ regras_aplicadas.join(', ') || 'Nenhuma' }}
+        </p>
       </div>
     </div>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 /*
  * The MIT License
  *
@@ -96,175 +104,170 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, Ref } from 'vue';
+import { DateUtils } from '../utils/DateUtils';
+import { CurrencyUtils } from '../utils/CurrencyUtils';
+import { ApiHelper } from '../utils/ApiHelper';
 import API from '../services/api';
 
-const props = defineProps(['id']);
-const contrato = ref(null);
-const servicos = ref([]);
-const regras_aplicadas = ref([]);
-const item = ref({ servico_id: '', quantidade: 1, valor_unitario: null });
-const apiError = ref('');
-const errors = ref({ servico: '', quantidade: '', valor: '' });
-
-const formatMoney = (value) => {
-
-  return Number(value || 0).toLocaleString('pt-BR', {
-    style: 'currency',
-    currency: 'BRL'
-  });
-
-};
-
-function formatDate(dateString) {
-
-  if (!dateString) {
-    return '-';
-  }
-
-  return new Date(dateString).toLocaleDateString('pt-BR');
+interface IServico {
+  id: number;
+  nome: string;
+  valor_base_mensal: number;
 }
 
-const valorItemMask = computed(() => {
-
-  if (item.value.valor_unitario == null) {
-    return '';
-  }
-
-  return Number(item.value.valor_unitario).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-});
-
-function onValorItemInput(element) {
-
-  const digits = element.target.value.replace(/\D/g, '');
-
-  const num = digits ? parseInt(digits, 10) / 100 : null;
-
-  item.value.valor_unitario = num;
-
-  element.target.value = num != null ? valorItemMask.value : '';
+interface IContratoItem {
+  id: number;
+  servico_id: number;
+  servico?: IServico;
+  quantidade: number;
+  valor_unitario: number;
 }
 
-function onServicoChange() {
-
-  const servico = servicos.value.find(s => s.id == item.value.servico_id);
-
-  if (servico) {
-    item.value.valor_unitario = Number(servico.valor_base_mensal);
-  }
+interface IContratoTotais {
+  subtotal: number;
+  desconto_total: number;
+  total: number;
+  regras_aplicadas?: string[];
 }
 
-const total = computed(() => {
-
-  if (!contrato.value?.totais) {
-    return 0;
-  }
-
-  return contrato.value.totais.total;
-});
-
-const subtotal = computed(() => {
-
-  if (!contrato.value?.totais) {
-    return 0;
-  }
-
-  return contrato.value.totais.subtotal;
-});
-
-const desconto_total = computed(() => {
-
-  if (!contrato.value?.totais) {
-    return 0;
-  }
-
-  return contrato.value.totais.desconto_total;
-});
-
-
-
-function handleApiError(error) {
-
-  const msg = error.response?.data?.message || 'Erro ao processar requisição';
-
-  apiError.value = msg;
-
-  const lower = msg.toLowerCase();
-
-  if (lower.includes('serviço') || lower.includes('servico')) {
-
-    errors.value.servico = msg;
-
-  } else if (lower.includes('quantidade')) {
-
-    errors.value.quantidade = msg;
-
-  } else if (lower.includes('valor')) {
-
-    errors.value.valor = msg;
-
-  }
+interface IContratoDetalhe {
+  id: number;
+  cliente?: { nome: string };
+  data_inicio: string;
+  status: string;
+  itens?: IContratoItem[];
+  totais: IContratoTotais;
 }
 
-async function carregar() {
-
-  try {
-
-    const { data } = await API.getContrato(props.id);
-
-    contrato.value = data;
-
-    regras_aplicadas.value = data.totais.regras_aplicadas || [];
-
-    const response = await API.getServicos();
-
-    servicos.value = Array.isArray(response.data) ? response.data : response.data.data || [];
-
-  } catch (error) {
-    handleApiError(error);
-  }
+interface IItemForm {
+  servico_id: number | string;
+  quantidade: number;
+  valor_unitario: number | null;
 }
 
-async function adicionarItem() {
-
-  apiError.value = '';
-
-  errors.value = { servico: '', quantidade: '', valor: '' };
-
-  if (!item.value.servico_id) {
-
-    errors.value.servico = 'Selecione um serviço';
-
-    return;
-  }
-
-  if (!item.value.quantidade || item.value.quantidade < 1) {
-
-    errors.value.quantidade = 'Quantidade inválida';
-
-    return;
-  }
-
-  if (!item.value.valor_unitario) {
-
-    const servico = servicos.value.find(servico => servico.id == item.value.servico_id);
-
-    item.value.valor_unitario = servico?.valor_base_mensal;
-
-  }
-
-  try {
-
-    await API.addItem(props.id, item.value);
-
-    item.value = { servico_id: '', quantidade: 1, valor_unitario: null };
-
-    carregar();
-
-  } catch (error) {
-    handleApiError(error);
-  }
+interface IItemErrors {
+  servico: string;
+  quantidade: string;
+  valor: string;
 }
+
+const props = defineProps<{ id: string | number }>();
+
+class ContratoItensViewModel {
+
+  private contratoId: string | number;
+
+  public contrato: Ref<IContratoDetalhe | null> = ref(null);
+  public servicos: Ref<IServico[]> = ref([]);
+  public regras_aplicadas: Ref<string[]> = ref([]);
+  public item: Ref<IItemForm> = ref({ servico_id: '', quantidade: 1, valor_unitario: null });
+  public apiError: Ref<string> = ref('');
+  public errors: Ref<IItemErrors> = ref({ servico: '', quantidade: '', valor: '' });
+
+  constructor(contratoId: string | number) {
+    this.contratoId = contratoId;
+  }
+
+  public get valorItemMask() {
+    return computed(() => CurrencyUtils.formatBRL(this.item.value.valor_unitario));
+  }
+
+  public get total() {
+    return computed(() => this.contrato.value?.totais?.total || 0);
+  }
+
+  public get subtotal() {
+    return computed(() => this.contrato.value?.totais?.subtotal || 0);
+  }
+
+  public get desconto_total() {
+    return computed(() => this.contrato.value?.totais?.desconto_total || 0);
+  }
+
+  public onValorItemInput = (event: Event): void => {
+
+    const target = event.target as HTMLInputElement;
+    const value = CurrencyUtils.parseFromMask(target.value);
+
+    this.item.value.valor_unitario = value;
+    target.value = value != null ? CurrencyUtils.formatBRL(value) : '';
+  };
+
+  public onServicoChange = (): void => {
+    const servico = this.servicos.value.find(s => s.id == this.item.value.servico_id);
+    if (servico) {
+      this.item.value.valor_unitario = Number(servico.valor_base_mensal);
+    }
+  };
+
+  private handleApiError = (error: any): void => {
+    ApiHelper.mapErrorToFields(
+      error,
+      this.errors.value as unknown as Record<string, string>,
+      this.apiError,
+      { 'serviço': 'servico', 'servico': 'servico', 'quantidade': 'quantidade', 'valor': 'valor' }
+    );
+  };
+
+  public carregar = async (): Promise<void> => {
+
+    try {
+
+      const [resContrato, resServicos] = await Promise.all([
+        API.getContrato(this.contratoId),
+        API.getServicos()
+      ]);
+
+      this.contrato.value = resContrato.data;
+      this.regras_aplicadas.value = resContrato.data?.totais?.regras_aplicadas || [];
+      this.servicos.value = Array.isArray(resServicos.data) ? resServicos.data : resServicos.data?.data || [];
+
+    } catch (error) {
+      this.handleApiError(error);
+    }
+
+  };
+
+  public adicionarItem = async (): Promise<void> => {
+
+    this.apiError.value = '';
+    this.errors.value = { servico: '', quantidade: '', valor: '' };
+
+    if (!this.item.value.servico_id) {
+      this.errors.value.servico = 'Selecione um serviço';
+      return;
+    }
+
+    if (!this.item.value.quantidade || this.item.value.quantidade < 1) {
+      this.errors.value.quantidade = 'Quantidade inválida';
+      return;
+    }
+
+    if (this.item.value.valor_unitario == null) {
+      const servico = this.servicos.value.find(s => s.id == this.item.value.servico_id);
+      this.item.value.valor_unitario = servico ? Number(servico.valor_base_mensal) : 0;
+    }
+
+    try {
+
+      await API.addItem(this.contratoId, this.item.value);
+      this.item.value = { servico_id: '', quantidade: 1, valor_unitario: null };
+      await this.carregar();
+
+    } catch (error) {
+      this.handleApiError(error);
+    }
+  };
+}
+
+const contratoItensViewModel = new ContratoItensViewModel(props.id);
+
+const { contrato, servicos, regras_aplicadas, item, apiError, errors, valorItemMask, total, subtotal, desconto_total } = contratoItensViewModel;
+
+const { onValorItemInput, onServicoChange, carregar, adicionarItem } = contratoItensViewModel;
 
 onMounted(carregar);
+
+defineExpose({ DateUtils, CurrencyUtils });
 </script>
