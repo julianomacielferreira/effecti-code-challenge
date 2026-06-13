@@ -397,7 +397,7 @@ Tabela `contrato_itens`
 
 ## Como adicionar uma nova regra para cálculo total do contrato
 
-Foi utilizado o padrão `Strategy` (ver [https://refactoring.guru/design-patterns/strategy](https://refactoring.guru/design-patterns/strategy)) na classe `App\Services\CalculadoraDeContrato`.
+Foi utilizado o padrão `Strategy` ([https://refactoring.guru/design-patterns/strategy](https://refactoring.guru/design-patterns/strategy)) na classe `App\Services\CalculadoraDeContrato`.
 
 Cada regra recebe o Contrato e o valor atual e devolve um o valor com desconto aplicado. A Calculadora só soma os resultados — ela não sabe como cada desconto funciona.
 
