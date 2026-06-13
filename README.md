@@ -21,7 +21,7 @@ Este documento contém as instruções para configurar e rodar o projeto.
 - **Banco**: MySQL 8
 - **Docker / docker-compose**
 
-## Estrutura do Projeto
+## Estrutura de arquivos do Projeto
 
 ```
 .
