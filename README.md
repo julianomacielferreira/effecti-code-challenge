@@ -56,7 +56,7 @@ DB_USERNAME=effecti
 DB_PASSWORD=z0x9c8v7
 ```
 
-Abaixo segue o diagrama que mostra as tabelas para modelo de dados do projeto.
+Abaixo segue o diagrama que mostra as tabelas para o modelo de dados do projeto.
 
 ![](db_model_effecti_erp.png)
 
