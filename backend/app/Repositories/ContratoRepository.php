@@ -32,7 +32,7 @@ class ContratoRepository
     public function paginate(array $filtros)
     {
         return Contrato::with(['cliente', 'itens.servico'])
-            ->when($filtros['status'] ?? null, fn($q, $s) => $q->where('status', $s))
+            ->when($filtros['status'] ?? null, fn($query, $search) => $query->where('status', $search))
             ->paginate(15);
     }
 
