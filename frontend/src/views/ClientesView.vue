@@ -2,13 +2,13 @@
   <div>
     <div class="flex justify-between items-center mb-6">
       <h2 class="text-2xl font-bold">Clientes</h2>
-      <button @click="showForm = !showForm" class="bg-slate-900 text-white px-4 py-2 rounded">
+      <button @click="abrirNovo" class="bg-slate-900 text-white px-4 py-2 rounded">
         {{ showForm ? 'Cancelar' : 'Novo Cliente' }}
       </button>
     </div>
 
     <div v-if="showForm" class="bg-white p-4 rounded shadow mb-6">
-      <h3 class="font-semibold mb-3">Cadastrar Cliente</h3>
+      <h3 class="font-semibold mb-3">{{ editandoId ? 'Editar Cliente' : 'Cadastrar Cliente' }}</h3>
 
       <div v-if="apiError" class="bg-red-50 border border-red-400 text-red-700 px-3 py-2 rounded mb-3 text-sm">
         {{ apiError }}
@@ -34,7 +34,7 @@
         </div>
 
         <button :disabled="!formValido" class="bg-cyan-600 text-white rounded px-4 disabled:opacity-50">
-          Salvar
+          {{ editandoId ? 'Atualizar' : 'Salvar' }}
         </button>
       </form>
     </div>
@@ -72,8 +72,9 @@
                 {{ cliente.status || 'Ativo' }}
               </span>
             </td>
-            <td class="space-x-2">
-              <button @click="toggleStatus(cliente)" class="text-sm text-blue-600">
+            <td class="space-x-3">
+              <button @click="editar(cliente)" class="text-sm text-blue-600">Editar</button>
+              <button @click="toggleStatus(cliente)" class="text-sm text-amber-600">
                 {{ cliente.status === 'Ativo' ? 'Inativar' : 'Ativar' }}
               </button>
               <button @click="remover(cliente.id)" class="text-sm text-red-600">Excluir</button>
@@ -114,6 +115,7 @@ import API from '../services/api';
 
 const clientes = ref([]);
 const showForm = ref(false);
+const editandoId = ref(null);
 const form = ref({ nome: '', cpf_cnpj: '', email: '' });
 const filtros = ref({ search: '', status: '' });
 const errors = ref({ nome: '', cpf_cnpj: '', email: '' });
@@ -337,6 +339,34 @@ function handleApiError(error) {
   }
 }
 
+function abrirNovo() {
+
+  editandoId.value = null;
+
+  form.value = { nome: '', cpf_cnpj: '', email: '' };
+
+  errors.value = { nome: '', cpf_cnpj: '', email: '' };
+
+  apiError.value = '';
+
+  showForm.value = !showForm.value;
+}
+
+function editar(cliente) {
+
+  editandoId.value = cliente.id;
+
+  form.value = { nome: cliente.nome, cpf_cnpj: cliente.cpf_cnpj, email: cliente.email };
+
+  errors.value = { nome: '', cpf_cnpj: '', email: '' };
+
+  apiError.value = '';
+
+  showForm.value = true;
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 async function carregar() {
 
   try {
@@ -356,21 +386,21 @@ async function salvar() {
 
   errors.value.nome = form.value.nome.length < 3 ? 'Mínimo 3 caracteres' : '';
 
-  const okCpf = validarCpfCnpj();
-
-  const okEmail = validarEmail();
-
-  if (!okCpf || !okEmail || errors.value.nome) {
+  if (!validarCpfCnpj() || !validarEmail() || errors.value.nome) {
     return;
   }
 
   try {
 
-    await API.createCliente(form.value);
+    if (editandoId.value) {
+      await API.updateCliente(editandoId.value, form.value);
+    } else {
+      await API.createCliente(form.value);
+    }
+
+    showForm.value = false; editandoId.value = null;
 
     form.value = { nome: '', cpf_cnpj: '', email: '' };
-
-    showForm.value = false;
 
     carregar();
 
