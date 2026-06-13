@@ -356,7 +356,7 @@ function editar(cliente) {
 
   editandoId.value = cliente.id;
 
-  form.value = { nome: cliente.nome, cpf_cnpj: cliente.cpf_cnpj, email: cliente.email };
+  form.value = { nome: cliente.nome, cpf_cnpj: maskCpfCnpj(cliente.cpf_cnpj), email: cliente.email };
 
   errors.value = { nome: '', cpf_cnpj: '', email: '' };
 
@@ -376,7 +376,9 @@ async function carregar() {
     clientes.value = Array.isArray(data) ? data : data.data || [];
 
   } catch (e) {
+
     handleApiError(e);
+
   }
 }
 
