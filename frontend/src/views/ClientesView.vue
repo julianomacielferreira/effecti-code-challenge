@@ -9,25 +9,27 @@
 
     <div v-if="showForm" class="bg-white p-4 rounded shadow mb-6">
       <h3 class="font-semibold mb-3">Cadastrar Cliente</h3>
+
+      <div v-if="apiError" class="bg-red-50 border border-red-400 text-red-700 px-3 py-2 rounded mb-3 text-sm">
+        {{ apiError }}
+      </div>
+
       <form @submit.prevent="salvar" class="grid grid-cols-1 md:grid-cols-4 gap-3">
-        <!-- NOME -->
         <div>
-          <input v-model="form.nome" placeholder="Nome" required class="border p-2 rounded w-full"
-            :class="{ 'border-red-500': errors.nome }" />
+          <input v-model="form.nome" @input="apiError = ''" placeholder="Nome" required
+            class="border p-2 rounded w-full" :class="{ 'border-red-500': errors.nome }" />
           <p v-if="errors.nome" class="text-red-600 text-xs mt-1">{{ errors.nome }}</p>
         </div>
 
-        <!-- CPF/CNPJ COM MÁSCARA -->
         <div>
           <input v-model="form.cpf_cnpj" @input="onCpfCnpjInput" placeholder="CPF ou CNPJ" required maxlength="18"
             class="border p-2 rounded w-full" :class="{ 'border-red-500': errors.cpf_cnpj }" />
           <p v-if="errors.cpf_cnpj" class="text-red-600 text-xs mt-1">{{ errors.cpf_cnpj }}</p>
         </div>
 
-        <!-- EMAIL -->
         <div>
-          <input v-model="form.email" @blur="validarEmail" type="email" placeholder="Email" required
-            class="border p-2 rounded w-full" :class="{ 'border-red-500': errors.email }" />
+          <input v-model="form.email" @blur="validarEmail" @input="apiError = ''" type="email" placeholder="Email"
+            required class="border p-2 rounded w-full" :class="{ 'border-red-500': errors.email }" />
           <p v-if="errors.email" class="text-red-600 text-xs mt-1">{{ errors.email }}</p>
         </div>
 
@@ -37,7 +39,6 @@
       </form>
     </div>
 
-    <!-- resto igual -->
     <div class="flex gap-3 mb-4">
       <input v-model="filtros.search" @input="carregar" placeholder="Buscar por nome..."
         class="border p-2 rounded flex-1" />
@@ -116,6 +117,7 @@ const showForm = ref(false);
 const form = ref({ nome: '', cpf_cnpj: '', email: '' });
 const filtros = ref({ search: '', status: '' });
 const errors = ref({ nome: '', cpf_cnpj: '', email: '' });
+const apiError = ref('');
 
 const onlyDigits = (value) => value.replace(/\D/g, '');
 
@@ -311,16 +313,46 @@ const formValido = computed(() => {
     !errors.value.cpf_cnpj &&
     !errors.value.email &&
     onlyDigits(form.value.cpf_cnpj).length >= 11;
-})
+});
+
+function handleApiError(error) {
+
+  const msg = error.response?.data?.message || 'Erro ao processar requisição';
+
+  apiError.value = msg;
+
+  const lower = msg.toLowerCase();
+
+  if (lower.includes('cpf') || lower.includes('cnpj')) {
+
+    errors.value.cpf_cnpj = msg;
+
+  } else if (lower.includes('email')) {
+
+    errors.value.email = msg;
+
+  } else if (lower.includes('nome')) {
+
+    errors.value.nome = msg;
+  }
+}
 
 async function carregar() {
 
-  const { data } = await API.getClientes(filtros.value);
+  try {
 
-  clientes.value = Array.isArray(data) ? data : data.data || [];
+    const { data } = await API.getClientes(filtros.value);
+
+    clientes.value = Array.isArray(data) ? data : data.data || [];
+
+  } catch (e) {
+    handleApiError(e);
+  }
 }
 
 async function salvar() {
+
+  apiError.value = '';
 
   errors.value.nome = form.value.nome.length < 3 ? 'Mínimo 3 caracteres' : '';
 
@@ -328,37 +360,60 @@ async function salvar() {
 
   const okEmail = validarEmail();
 
-  if (!okCpf || !okEmail || errors.value.nome) return;
+  if (!okCpf || !okEmail || errors.value.nome) {
+    return;
+  }
 
-  await API.createCliente(form.value);
+  try {
 
-  form.value = { nome: '', cpf_cnpj: '', email: '' };
+    await API.createCliente(form.value);
 
-  showForm.value = false;
+    form.value = { nome: '', cpf_cnpj: '', email: '' };
 
-  carregar();
+    showForm.value = false;
+
+    carregar();
+
+  } catch (e) {
+
+    handleApiError(e);
+
+  }
 }
 
 async function toggleStatus(cliente) {
 
-  const novo = cliente.status === 'Ativo' ? 'Inativo' : 'Ativo';
+  try {
 
-  await API.updateCliente(cliente.id, { status: novo });
+    const novo = cliente.status === 'Ativo' ? 'Inativo' : 'Ativo';
 
-  carregar();
+    await API.updateCliente(cliente.id, { status: novo });
 
+    carregar();
+
+  } catch (e) {
+    handleApiError(e);
+  }
 }
 
 async function remover(id) {
 
-  if (confirm('Excluir cliente?')) {
+  if (!confirm('Excluir cliente?')) {
+    return;
+  }
+
+  try {
 
     await API.deleteCliente(id);
 
     carregar();
+
+  } catch (e) {
+
+    handleApiError(e);
   }
 
 }
 
-onMounted(carregar)
+onMounted(carregar);
 </script>
