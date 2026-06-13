@@ -59,7 +59,7 @@
             <td>{{ formatDate(contrato.data_inicio) }}</td>
             <td>{{ formatDate(contrato.data_termino) }}</td>
             <td>{{ contrato.status }}</td>
-            <td>R$ {{ calcularTotal(contrato).toFixed(2) }}</td>
+            <td>{{ formatMoney(contrato.valor_total) }}</td>
             <td>
               <span :class="(contrato.itens?.length || 0) === 0 ? 'text-red-600 font-bold' : 'text-green-600'">
                 {{ contrato.itens?.length || 0 }}
@@ -78,7 +78,7 @@
           </tr>
         </tbody>
       </table>
-      <p class="text-xs text-gray-500 p-3">Regra: contrato não pode ser ativado sem pelo menos 1 item.</p>
+      <p class="text-xs text-gray-500 p-3">Regra: Contrato cancelado não pode ser editado.</p>
     </div>
   </div>
 </template>
@@ -126,6 +126,15 @@ function formatDate(dateString) {
   return new Date(dateString).toLocaleDateString('pt-BR');
 }
 
+const formatMoney = (value) => {
+
+  return Number(value || 0).toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL'
+  });
+
+};
+
 function validarForm() {
 
   errors.value.cliente = !form.value.cliente_id ? 'Selecione um cliente' : '';
@@ -154,13 +163,6 @@ function handleApiError(error) {
     errors.value.data = msg;
 
   }
-}
-
-function calcularTotal(contrato) {
-
-  if (!contrato.itens) return 0;
-
-  return contrato.itens.reduce((sum, item) => sum + (item.quantidade * item.valor_unitario), 0);
 }
 
 async function carregar() {
@@ -215,7 +217,7 @@ async function toggleStatus(contrato) {
 
       if (!data.itens || data.itens.length === 0) {
 
-        apiError.value = 'Não é possível ativar: contrato precisa ter pelo menos 1 serviço.';
+        apiError.value = 'Contrato cancelado não pode ser editado.';
 
         alert(apiError.value);
 

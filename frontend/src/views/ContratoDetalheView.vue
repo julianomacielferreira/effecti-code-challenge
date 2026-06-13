@@ -5,11 +5,13 @@
       <router-link to="/contratos" class="text-blue-600">← Voltar</router-link>
     </div>
 
-    <div class="bg-white p-4 rounded shadow mb-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="bg-white p-4 rounded shadow mb-6 grid grid-cols-2 md:grid-cols-6 gap-6">
       <div><strong>Cliente:</strong> {{ contrato.cliente?.nome }}</div>
       <div><strong>Início:</strong> {{ formatDate(contrato.data_inicio) }}</div>
       <div><strong>Status:</strong> {{ contrato.status }}</div>
-      <div><strong>Total Mensal:</strong> R$ {{ total.toFixed(2) }}</div>
+      <div><strong>Subtotal:</strong> {{ formatMoney(subtotal) }}</div>
+      <div><strong>Desconto:</strong> {{ formatMoney(desconto_total) }}</div>
+      <div><strong>Total Mensal:</strong> {{ formatMoney(total) }}</div>
     </div>
 
     <div class="bg-white p-4 rounded shadow">
@@ -64,8 +66,7 @@
       </table>
 
       <div class="mt-4 p-3 bg-slate-50 rounded">
-        <p class="text-sm text-gray-600">Regra de negócio aplicada: desconto de 10% para quantidade ≥ 10 em um item
-          (exemplo implementado no frontend para demonstração).</p>
+        <p class="text-sm text-gray-600">Regras de negócio aplicadas: {{ regras_aplicadas }} </p>
       </div>
     </div>
   </div>
@@ -101,13 +102,14 @@ import API from '../services/api';
 const props = defineProps(['id']);
 const contrato = ref(null);
 const servicos = ref([]);
+const regras_aplicadas = ref([]);
 const item = ref({ servico_id: '', quantidade: 1, valor_unitario: null });
 const apiError = ref('');
 const errors = ref({ servico: '', quantidade: '', valor: '' });
 
-const formatMoney = (val) => {
+const formatMoney = (value) => {
 
-  return Number(val || 0).toLocaleString('pt-BR', {
+  return Number(value || 0).toLocaleString('pt-BR', {
     style: 'currency',
     currency: 'BRL'
   });
@@ -154,22 +156,32 @@ function onServicoChange() {
 
 const total = computed(() => {
 
-  if (!contrato.value?.itens) {
+  if (!contrato.value?.totais) {
     return 0;
   }
 
-  return contrato.value.itens.reduce((sum, item) => {
-
-    let subtotal = item.quantidade * item.valor_unitario;
-
-    //@TODO - Remover Regra de negócio é aplicada no backend: desconto por quantidade
-    if (item.quantidade >= 10) subtotal *= 0.9;
-
-    return sum + subtotal;
-
-  }, 0);
-
+  return contrato.value.totais.total;
 });
+
+const subtotal = computed(() => {
+
+  if (!contrato.value?.totais) {
+    return 0;
+  }
+
+  return contrato.value.totais.subtotal;
+});
+
+const desconto_total = computed(() => {
+
+  if (!contrato.value?.totais) {
+    return 0;
+  }
+
+  return contrato.value.totais.desconto_total;
+});
+
+
 
 function handleApiError(error) {
 
@@ -201,6 +213,8 @@ async function carregar() {
     const { data } = await API.getContrato(props.id);
 
     contrato.value = data;
+
+    regras_aplicadas.value = data.totais.regras_aplicadas || [];
 
     const response = await API.getServicos();
 
