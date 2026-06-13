@@ -169,7 +169,7 @@ Cada regra recebe o Contrato e o valor atual e devolve um o valor com desconto a
 
 Por exemplo, para adicionar uma nova regra que cria um desconto de aniversário você pode seguir o seguinte exemplo:
 
-1. Crie uma nova classe Rule no arquivo `backend/app/Rules/Contrato/DescontoAniversarioRule.php`
+1. Crie uma nova classe `DescontoAniversarioRule` no arquivo `backend/app/Rules/Contrato/DescontoAniversarioRule.php`
 
 ```php
 <?php
@@ -194,7 +194,7 @@ class DescontoAniversarioRule implements ContratoRule
 }
 ```
 
-2. Crie um teste isolado `backend/tests/Unit/Rules/DescontoAniversarioRuleTest.php`:
+2. Crie um teste `DescontoAniversarioRuleTest` isolado em `backend/tests/Unit/Rules/DescontoAniversarioRuleTest.php`:
 
 ```php
 /** @test */
@@ -211,7 +211,7 @@ public function aplica_10_porcento_no_mes_aniversario()
 }
 ```
 
-3. Config – adicione a nova regra ativa em `config/contrato.php`:
+3. Config – adicione a nova regra ativa em `backend/config/contrato.php`:
 
 ```php
 return [
