@@ -45,6 +45,17 @@ DB_PASSWORD=z0x9c8v7
 
 O arquivo [schema.sql](./docker/mysql/schema.sql) contém o código DDL tabelas.
 
+As credenciais para conexão com o banco são:
+
+```bash
+DB_CONNECTION=mysql
+DB_HOST=mysql
+DB_PORT=3306
+DB_DATABASE=effecti_erp
+DB_USERNAME=effecti
+DB_PASSWORD=z0x9c8v7
+```
+
 Abaixo segue o diagrama que mostra as tabelas para modelo de dados do projeto.
 
 ![](db_model_effecti_erp.png)
