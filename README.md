@@ -255,7 +255,7 @@ Este documento contém as instruções para configurar e rodar o projeto.
 
 ## Configuração do arquivo .ENV
 
-Renomeie o arquivo [.env.example](https://github.com/julianomacielferreira/effecti-code-challenge/blob/main/backend/.env.example) para **.env**
+Renomeie o arquivo [.env.example](https://github.com/julianomacielferreira/effecti-code-challenge/blob/main/backend/.env.example) em `backend/.env.example` para **.env**
 e altere as seguintes variáveis de ambiente:
 
 ```bash
