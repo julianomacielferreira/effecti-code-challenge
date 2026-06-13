@@ -41,6 +41,63 @@ DB_PASSWORD=z0x9c8v7
 
 ```
 
+## Inicializar o Projeto com Docker
+
+É necessário instalar o **[Docker](https://docs.docker.com/install/)** como o **[Docker Compose](https://docs.docker.com/compose/install/)** na sua máquina.
+
+Execute os seguintes comandos no terminal:
+
+```bash
+$ docker-compose build
+```
+
+```bash
+$ docker-compose up
+```
+
+A saída será similar a essa:
+
+```bash
+Starting effecti_mysql    ... done
+Starting effecti_frontend ... done
+Starting effecti_backend  ... done
+Starting effecti_nginx    ... done
+Attaching to effecti_frontend, effecti_mysql, effecti_backend, effecti_nginx
+effecti_mysql | 2026-06-12 11:33:35+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.46-1.el9 started.
+effecti_nginx | /docker-entrypoint.sh: /docker-entrypoint.d/ is not
+effecti_nginx | /docker-entrypoint.sh: Launching /docker-entrypoint.
+...
+effecti_mysql | 2026-06-12T11:33:36.208021Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+...
+effecti_frontend |
+effecti_frontend | added 59 packages, and audited 60 packages in 1m
+effecti_frontend |
+effecti_frontend | 11 packages are looking for funding
+effecti_frontend |   run `npm fund` for details
+effecti_frontend |
+effecti_frontend | 2 vulnerabilities (1 moderate, 1 high)
+effecti_frontend |
+effecti_frontend | To address all issues (including breaking changes), run:
+effecti_frontend |   npm audit fix --force
+effecti_frontend |
+effecti_frontend | Run `npm audit` for details.
+effecti_frontend | npm notice
+effecti_frontend | npm notice New major version of npm available! 10.8.2 -> 11.17.0
+effecti_frontend | npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.17.0
+effecti_frontend | npm notice To update run: npm install -g npm@11.17.0
+effecti_frontend | npm notice
+effecti_frontend |
+effecti_frontend | > vue-effecti-erp@1.0.0 dev
+effecti_frontend | > vite --host 0.0.0.0 --port 5173
+effecti_frontend |
+effecti_frontend |
+effecti_frontend |   VITE v5.4.21  ready in 328 ms
+effecti_frontend |
+effecti_frontend |   ➜  Local:   http://localhost:5173/
+effecti_frontend |   ➜  Network: http://172.19.0.3:5173/
+...
+```
+
 ## Banco de Dados
 
 O arquivo [schema.sql](./docker/mysql/schema.sql) contém o código DDL tabelas.
@@ -195,63 +252,6 @@ return [
 - Para expandir ou remover as regras não é necessário modificar o Controller ou Service: basta só criar a classe e adicionar no contrato config ou remover a linha de uma já existente.
 - Para alterar a sequência de aplicação é só mudar a ordem no array.
 - Para desativar basta comentar a linha no config, sem necessidade de deletar outros códigos da aplicação.
-
-## Inicializar o Projeto com Docker
-
-É necessário instalar o **[Docker](https://docs.docker.com/install/)** como o **[Docker Compose](https://docs.docker.com/compose/install/)** na sua máquina.
-
-Execute os seguintes comandos no terminal:
-
-```bash
-$ docker-compose build
-```
-
-```bash
-$ docker-compose up
-```
-
-A saída será similar a essa:
-
-```bash
-Starting effecti_mysql    ... done
-Starting effecti_frontend ... done
-Starting effecti_backend  ... done
-Starting effecti_nginx    ... done
-Attaching to effecti_frontend, effecti_mysql, effecti_backend, effecti_nginx
-effecti_mysql | 2026-06-12 11:33:35+00:00 [Note] [Entrypoint]: Entrypoint script for MySQL Server 8.0.46-1.el9 started.
-effecti_nginx | /docker-entrypoint.sh: /docker-entrypoint.d/ is not
-effecti_nginx | /docker-entrypoint.sh: Launching /docker-entrypoint.
-...
-effecti_mysql | 2026-06-12T11:33:36.208021Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
-...
-effecti_frontend |
-effecti_frontend | added 59 packages, and audited 60 packages in 1m
-effecti_frontend |
-effecti_frontend | 11 packages are looking for funding
-effecti_frontend |   run `npm fund` for details
-effecti_frontend |
-effecti_frontend | 2 vulnerabilities (1 moderate, 1 high)
-effecti_frontend |
-effecti_frontend | To address all issues (including breaking changes), run:
-effecti_frontend |   npm audit fix --force
-effecti_frontend |
-effecti_frontend | Run `npm audit` for details.
-effecti_frontend | npm notice
-effecti_frontend | npm notice New major version of npm available! 10.8.2 -> 11.17.0
-effecti_frontend | npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.17.0
-effecti_frontend | npm notice To update run: npm install -g npm@11.17.0
-effecti_frontend | npm notice
-effecti_frontend |
-effecti_frontend | > vue-effecti-erp@1.0.0 dev
-effecti_frontend | > vite --host 0.0.0.0 --port 5173
-effecti_frontend |
-effecti_frontend |
-effecti_frontend |   VITE v5.4.21  ready in 328 ms
-effecti_frontend |
-effecti_frontend |   ➜  Local:   http://localhost:5173/
-effecti_frontend |   ➜  Network: http://172.19.0.3:5173/
-...
-```
 
 ## Migrations
 
