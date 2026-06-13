@@ -97,7 +97,7 @@
  * THE SOFTWARE.
  */
 import { ref, onMounted, computed } from 'vue';
-import api from '../services/api';
+import API from '../services/api';
 
 const contratos = ref([]);
 const clientes = ref([]);
@@ -125,11 +125,11 @@ function calcularTotal(contrato) {
 
 async function carregar() {
 
-  const { data } = await api.getContratos();
+  const { data } = await API.getContratos();
 
   contratos.value = Array.isArray(data) ? data : data.data || [];
 
-  const responseClientes = await api.getClientes();
+  const responseClientes = await API.getClientes();
 
   clientes.value = Array.isArray(responseClientes.data) ? responseClientes.data : responseClientes.data.data || [];
 }
@@ -138,7 +138,7 @@ async function salvar() {
 
   if (!validarForm()) return;
 
-  await api.createContrato(form.value);
+  await API.createContrato(form.value);
 
   showForm.value = false;
 
@@ -154,7 +154,7 @@ async function toggleStatus(contrato) {
   // REGRA DE NEGÓCIO: não ativar sem itens
   if (novo === 'Ativo') {
 
-    const { data } = await api.getContrato(contrato.id);
+    const { data } = await API.getContrato(contrato.id);
 
     if (!data.itens || data.itens.length === 0) {
 
@@ -164,7 +164,7 @@ async function toggleStatus(contrato) {
     }
   }
 
-  await api.updateContrato(contrato.id, { status: novo });
+  await API.updateContrato(contrato.id, { status: novo });
 
   carregar();
 }
@@ -173,7 +173,7 @@ async function remover(id) {
 
   if (confirm('Excluir contrato ?')) {
 
-    await api.deleteContrato(id);
+    await API.deleteContrato(id);
 
     carregar();
   }

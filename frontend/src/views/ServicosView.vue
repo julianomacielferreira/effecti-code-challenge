@@ -78,7 +78,7 @@
  * THE SOFTWARE.
  */
 import { ref, onMounted, computed } from 'vue';
-import api from '../services/api';
+import API from '../services/api';
 
 const servicos = ref([]);
 const showForm = ref(false);
@@ -127,7 +127,7 @@ const formValido = computed(() => validarNome() && validarValor());
 
 async function carregar() {
 
-  const { data } = await api.getServicos({ search: busca.value });
+  const { data } = await API.getServicos({ search: busca.value });
 
   servicos.value = Array.isArray(data) ? data : data.data || [];
 
@@ -141,11 +141,11 @@ async function salvar() {
 
   if (editando.value) {
 
-    await api.updateServico(editando.value, form.value);
+    await API.updateServico(editando.value, form.value);
 
   } else {
 
-    await api.createServico(form.value);
+    await API.createServico(form.value);
 
   }
 
@@ -173,7 +173,7 @@ async function remover(id) {
 
   if (confirm('Excluir serviço?')) {
 
-    await api.deleteServico(id);
+    await API.deleteServico(id);
 
     carregar();
   }

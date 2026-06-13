@@ -81,7 +81,7 @@
  * THE SOFTWARE.
  */
 import { ref, onMounted, computed } from 'vue';
-import api from '../services/api';
+import API from '../services/api';
 
 const props = defineProps(['id']);
 const contrato = ref(null);
@@ -106,11 +106,11 @@ const total = computed(() => {
 
 async function carregar() {
 
-  const { data } = await api.getContrato(props.id);
+  const { data } = await API.getContrato(props.id);
 
   contrato.value = data;
 
-  const responseServicos = await api.getServicos();
+  const responseServicos = await API.getServicos();
 
   servicos.value = Array.isArray(responseServicos.data) ? responseServicos.data : responseServicos.data.data || [];
 }
@@ -125,7 +125,7 @@ async function adicionarItem() {
 
   }
 
-  await api.addItem(props.id, item.value);
+  await API.addItem(props.id, item.value);
 
   item.value = { servico_id: '', quantidade: 1, valor_unitario: null };
 

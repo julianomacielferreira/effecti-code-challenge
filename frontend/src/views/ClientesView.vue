@@ -109,7 +109,7 @@
  * THE SOFTWARE.
  */
 import { ref, onMounted, computed } from 'vue';
-import api from '../services/api';
+import API from '../services/api';
 
 const clientes = ref([]);
 const showForm = ref(false);
@@ -315,7 +315,7 @@ const formValido = computed(() => {
 
 async function carregar() {
 
-  const { data } = await api.getClientes(filtros.value);
+  const { data } = await API.getClientes(filtros.value);
 
   clientes.value = Array.isArray(data) ? data : data.data || [];
 }
@@ -330,7 +330,7 @@ async function salvar() {
 
   if (!okCpf || !okEmail || errors.value.nome) return;
 
-  await api.createCliente(form.value);
+  await API.createCliente(form.value);
 
   form.value = { nome: '', cpf_cnpj: '', email: '' };
 
@@ -339,11 +339,11 @@ async function salvar() {
   carregar();
 }
 
-async function toggleStatus(c) {
+async function toggleStatus(cliente) {
 
-  const novo = c.status === 'Ativo' ? 'Inativo' : 'Ativo';
+  const novo = cliente.status === 'Ativo' ? 'Inativo' : 'Ativo';
 
-  await api.updateCliente(c.id, { status: novo });
+  await API.updateCliente(cliente.id, { status: novo });
 
   carregar();
 
@@ -353,7 +353,7 @@ async function remover(id) {
 
   if (confirm('Excluir cliente?')) {
 
-    await api.deleteCliente(id);
+    await API.deleteCliente(id);
 
     carregar();
   }
