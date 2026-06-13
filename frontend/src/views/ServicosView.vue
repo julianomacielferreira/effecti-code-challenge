@@ -38,13 +38,13 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="s in servicos" :key="s.id" class="border-t">
-            <td class="p-3">{{ s.id }}</td>
-            <td>{{ s.nome }}</td>
-            <td>R$ {{ Number(s.valor_base_mensal).toFixed(2) }}</td>
+          <tr v-for="servico in servicos" :key="servico.id" class="border-t">
+            <td class="p-3">{{ servico.id }}</td>
+            <td>{{ servico.nome }}</td>
+            <td>R$ {{ Number(servico.valor_base_mensal).toFixed(2) }}</td>
             <td class="space-x-2">
-              <button @click="editar(s)" class="text-blue-600 text-sm">Editar</button>
-              <button @click="remover(s.id)" class="text-red-600 text-sm">Excluir</button>
+              <button @click="editar(servico)" class="text-blue-600 text-sm">Editar</button>
+              <button @click="remover(servico.id)" class="text-red-600 text-sm">Excluir</button>
             </td>
           </tr>
         </tbody>

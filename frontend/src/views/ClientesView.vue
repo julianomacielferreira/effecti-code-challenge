@@ -61,17 +61,21 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="c in clientes" :key="c.id" class="border-t">
-            <td class="p-3">{{ c.id }}</td>
-            <td>{{ c.nome }}</td>
-            <td>{{ c.cpf_cnpj }}</td>
-            <td>{{ c.email }}</td>
-            <td><span :class="c.status === 'Ativo' ? 'text-green-600' : 'text-red-600'">{{ c.status || 'Ativo' }}</span>
+          <tr v-for="cliente in clientes" :key="cliente.id" class="border-t">
+            <td class="p-3">{{ cliente.id }}</td>
+            <td>{{ cliente.nome }}</td>
+            <td>{{ cliente.cpf_cnpj }}</td>
+            <td>{{ cliente.email }}</td>
+            <td>
+              <span :class="cliente.status === 'Ativo' ? 'text-green-600' : 'text-red-600'">
+                {{ cliente.status || 'Ativo' }}
+              </span>
             </td>
             <td class="space-x-2">
-              <button @click="toggleStatus(c)" class="text-sm text-blue-600">{{ c.status === 'Ativo' ? 'Inativar' :
-                'Ativar' }}</button>
-              <button @click="remover(c.id)" class="text-sm text-red-600">Excluir</button>
+              <button @click="toggleStatus(cliente)" class="text-sm text-blue-600">
+                {{ cliente.status === 'Ativo' ? 'Inativar' : 'Ativar' }}
+              </button>
+              <button @click="remover(cliente.id)" class="text-sm text-red-600">Excluir</button>
             </td>
           </tr>
         </tbody>
