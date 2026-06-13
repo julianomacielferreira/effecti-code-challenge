@@ -24,16 +24,21 @@
           </select>
           <p v-if="errors.cliente" class="text-red-600 text-xs mt-1">{{ errors.cliente }}</p>
         </div>
+
         <div>
           <input v-model="form.data_inicio" @change="validarForm" type="date" required class="border p-2 rounded w-full"
             :class="{ 'border-red-500': errors.data }" />
           <p v-if="errors.data" class="text-red-600 text-xs mt-1">{{ errors.data }}</p>
         </div>
+
         <select v-model="form.status" class="border p-2 rounded">
-          <option>Ativo</option>
-          <option>Cancelado</option>
+          <option value="Ativo">Ativo</option>
+          <option value="Cancelado">Cancelado</option>
         </select>
-        <button :disabled="!formValido" class="bg-cyan-600 text-white rounded px-4 disabled:opacity-50">Criar</button>
+
+        <button :disabled="!formValido" class="bg-cyan-600 text-white rounded px-4 disabled:opacity-50">
+          Criar
+        </button>
       </form>
     </div>
 
@@ -53,37 +58,52 @@
           </tr>
         </thead>
         <tbody>
+          <tr v-if="contratos.length === 0">
+            <td colspan="9" class="p-6 text-center text-gray-500">
+              Nenhum contrato encontrado.
+            </td>
+          </tr>
+
           <tr v-for="contrato in contratos" :key="contrato.id" class="border-t hover:bg-gray-50">
             <td class="p-3">{{ contrato.id }}</td>
             <td>{{ contrato.cliente?.nome || contrato.cliente_id }}</td>
-            <td>{{ formatDate(contrato.data_inicio) }}</td>
-            <td>{{ formatDate(contrato.data_termino) }}</td>
-            <td>{{ contrato.status }}</td>
-            <td>{{ formatMoney(contrato.valor_total) }}</td>
+            <td>{{ DateUtils.formatPTBR(contrato.data_inicio) }}</td>
+            <td>{{ DateUtils.formatPTBR(contrato.data_termino) }}</td>
+            <td>
+              <span :class="contrato.status === 'Ativo' ? 'text-green-600' : 'text-red-600'">
+                {{ contrato.status }}
+              </span>
+            </td>
+            <td>{{ CurrencyUtils.formatCurrency(contrato.valor_total) }}</td>
             <td>
               <span :class="(contrato.itens?.length || 0) === 0 ? 'text-red-600 font-bold' : 'text-green-600'">
                 {{ contrato.itens?.length || 0 }}
               </span>
             </td>
-            <td>{{ formatDate(contrato.updated_at) }}</td>
+            <td>{{ DateUtils.formatPTBR(contrato.updated_at) }}</td>
             <td class="space-x-2">
-              <router-link :to="`/contratos/${contrato.id}`" class="text-blue-600 text-sm">
+              <router-link :to="`/contratos/${contrato.id}`" class="text-blue-600 text-sm hover:underline">
                 Adicionar Itens
               </router-link>
-              <button v-if="contrato.status === 'Ativo'" @click="toggleStatus(contrato)" class="text-sm text-amber-600">
+              <button v-if="contrato.status === 'Ativo'" @click="toggleStatus(contrato)"
+                class="text-sm text-amber-600 hover:underline">
                 Cancelar
               </button>
-              <button @click="remover(contrato.id)" class="text-sm text-red-600">Excluir</button>
+              <button @click="remover(contrato.id)" class="text-sm text-red-600 hover:underline">
+                Excluir
+              </button>
             </td>
           </tr>
         </tbody>
       </table>
-      <p class="text-xs text-gray-500 p-3">Regra: Contratos com status "Cancelado" não podem ser editados.</p>
+      <p class="text-xs text-gray-500 p-3">
+        Regra: Contratos com status "Cancelado" não podem ser editados.
+      </p>
     </div>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 /*
  * The MIT License
  *
@@ -107,149 +127,166 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, Ref } from 'vue';
+import { DateUtils } from '../utils/DateUtils';
+import { CurrencyUtils } from '../utils/CurrencyUtils';
+import { ApiHelper } from '../utils/ApiHelper';
 import API from '../services/api';
 
-const contratos = ref([]);
-const clientes = ref([]);
-const showForm = ref(false);
-const form = ref({ cliente_id: '', data_inicio: new Date().toISOString().slice(0, 10), status: 'Ativo' });
-const errors = ref({ cliente: '', data: '' });
-const apiError = ref('');
-
-function formatDate(dateString) {
-
-  if (!dateString) {
-    return '-';
-  }
-
-  return new Date(dateString).toLocaleDateString('pt-BR');
+interface ICliente {
+  id: number;
+  nome: string;
 }
 
-const formatMoney = (value) => {
-
-  return Number(value || 0).toLocaleString('pt-BR', {
-    style: 'currency',
-    currency: 'BRL'
-  });
-
-};
-
-function validarForm() {
-
-  errors.value.cliente = !form.value.cliente_id ? 'Selecione um cliente' : '';
-
-  errors.value.data = !form.value.data_inicio ? 'Data de início obrigatória' : '';
-
-  return !errors.value.cliente && !errors.value.data;
+interface IContratoItem {
+  id: number;
 }
 
-const formValido = computed(() => validarForm());
-
-function handleApiError(error) {
-
-  const msg = error.response?.data?.message || 'Erro ao processar requisição';
-
-  apiError.value = msg;
-
-  const lower = msg.toLowerCase();
-
-  if (lower.includes('cliente')) {
-
-    errors.value.cliente = msg;
-
-  } else if (lower.includes('data')) {
-
-    errors.value.data = msg;
-
-  }
+interface IContrato {
+  id: number;
+  cliente_id: number;
+  cliente?: ICliente;
+  data_inicio: string;
+  data_termino?: string;
+  status: 'Ativo' | 'Cancelado';
+  valor_total: number;
+  itens?: IContratoItem[];
+  updated_at: string;
 }
 
-async function carregar() {
-
-  try {
-
-    const { data } = await API.getContratos();
-
-    contratos.value = Array.isArray(data) ? data : data.data || [];
-
-    const response = await API.getClientes();
-
-    clientes.value = Array.isArray(response.data) ? response.data : response.data.data || [];
-
-  } catch (error) {
-    handleApiError(error);
-  }
+interface IContratoForm {
+  cliente_id: number | string;
+  data_inicio: string;
+  status: 'Ativo' | 'Cancelado';
 }
 
-async function salvar() {
-
-  apiError.value = '';
-
-  if (!validarForm()) {
-    return;
-  }
-
-  try {
-
-    await API.createContrato(form.value);
-
-    showForm.value = false;
-
-    form.value = { cliente_id: '', data_inicio: new Date().toISOString().slice(0, 10), status: 'Ativo' };
-
-    carregar();
-
-  } catch (error) {
-    handleApiError(error);
-  }
+interface IContratoErrors {
+  cliente: string;
+  data: string;
 }
 
-async function toggleStatus(contrato) {
+class ContratoViewModel {
 
-  const novo = contrato.status === 'Ativo' ? 'Cancelado' : 'Ativo';
+  public contratos: Ref<IContrato[]> = ref([]);
+  public clientes: Ref<ICliente[]> = ref([]);
+  public showForm: Ref<boolean> = ref(false);
+  public form: Ref<IContratoForm> = ref(this.getDefaultForm());
+  public errors: Ref<IContratoErrors> = ref({ cliente: '', data: '' });
+  public apiError: Ref<string> = ref('');
 
-  try {
+  private getDefaultForm(): IContratoForm {
 
-    if (novo === 'Ativo') {
-
-      const { data } = await API.getContrato(contrato.id);
-
-      if (!data.itens || data.itens.length === 0) {
-
-        apiError.value = 'Contrato cancelado não pode ser editado.';
-
-        alert(apiError.value);
-
-        return;
-      }
-
-    }
-
-    await API.updateContrato(contrato.id, { status: novo });
-
-    carregar();
-
-  } catch (error) {
-    handleApiError(error);
+    return {
+      cliente_id: '',
+      data_inicio: DateUtils.getTodayISO(),
+      status: 'Ativo'
+    };
   }
-}
 
-async function remover(id) {
+  public get formValido() {
+    return computed(() => this.validarForm());
+  }
 
-  if (confirm('Excluir contrato ?')) {
+  public validarForm = (): boolean => {
+
+    this.errors.value.cliente = !this.form.value.cliente_id ? 'Selecione um cliente' : '';
+    this.errors.value.data = !this.form.value.data_inicio ? 'Data de início obrigatória' : '';
+
+    return !this.errors.value.cliente && !this.errors.value.data;
+  };
+
+  private handleApiError = (error: any): void => {
+
+    ApiHelper.mapErrorToFields(
+      error,
+      this.errors.value as unknown as Record<string, string>,
+      this.apiError,
+      { 'cliente': 'cliente', 'data': 'data' }
+    );
+  };
+
+  public carregar = async (): Promise<void> => {
 
     try {
+      const [resContratos, resClientes] = await Promise.all([
+        API.getContratos(),
+        API.getClientes()
+      ]);
 
-      await API.deleteContrato(id);
+      this.contratos.value = Array.isArray(resContratos.data)
+        ? resContratos.data
+        : resContratos.data?.data || [];
 
-      carregar();
+      this.clientes.value = Array.isArray(resClientes.data)
+        ? resClientes.data
+        : resClientes.data?.data || [];
 
     } catch (error) {
-      handleApiError(error);
+      this.handleApiError(error);
     }
-  }
+  };
+
+  public salvar = async (): Promise<void> => {
+
+    this.apiError.value = '';
+
+    if (!this.validarForm()) return;
+
+    try {
+      await API.createContrato(this.form.value);
+
+      this.showForm.value = false;
+      this.form.value = this.getDefaultForm();
+
+      await this.carregar();
+    } catch (error) {
+      this.handleApiError(error);
+    }
+  };
+
+  public toggleStatus = async (contrato: IContrato): Promise<void> => {
+
+    const novoStatus = contrato.status === 'Ativo' ? 'Cancelado' : 'Ativo';
+
+    try {
+      if (novoStatus === 'Ativo') {
+        const { data } = await API.getContrato(contrato.id);
+
+        if (!data.itens || data.itens.length === 0) {
+          this.apiError.value = 'Contrato cancelado não pode ser editado.';
+          alert(this.apiError.value);
+          return;
+        }
+      }
+
+      await API.updateContrato(contrato.id, { status: novoStatus });
+      await this.carregar();
+
+    } catch (error) {
+      this.handleApiError(error);
+    }
+  };
+
+  public remover = async (id: number): Promise<void> => {
+
+    if (!confirm('Excluir contrato?')) return;
+
+    try {
+      await API.deleteContrato(id);
+      await this.carregar();
+    } catch (error) {
+      this.handleApiError(error);
+    }
+  };
 }
 
+const contratoViewModel = new ContratoViewModel();
+
+const { contratos, clientes, showForm, form, errors, apiError, formValido } = contratoViewModel;
+
+const { validarForm, carregar, salvar, toggleStatus, remover } = contratoViewModel;
+
 onMounted(carregar);
+
+defineExpose({ DateUtils, CurrencyUtils });
 </script>

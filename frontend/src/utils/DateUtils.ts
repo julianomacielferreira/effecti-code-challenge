@@ -21,32 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-import { StringUtils } from './StringUtils';
+export class DateUtils {
 
-export class CurrencyUtils {
+    public static formatPTBR(dateString?: string | null): string {
 
-    public static formatBRL(value: number | null): string {
+        if (!dateString) {
+            return '-';
+        }
 
-        if (value == null) return '';
-
-        return Number(value).toLocaleString('pt-BR', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        });
+        return new Date(dateString).toLocaleDateString('pt-BR');
     }
 
-    public static parseFromMask(value: string): number | null {
-
-        const digits = StringUtils.onlyDigits(value);
-
-        return digits ? parseInt(digits, 10) / 100 : null;
-    }
-
-    public static formatCurrency(value: number | string | null): string {
-
-        return Number(value || 0).toLocaleString('pt-BR', {
-            style: 'currency',
-            currency: 'BRL'
-        });
+    public static getTodayISO(): string {
+        return new Date().toISOString().slice(0, 10);
     }
 }

@@ -54,7 +54,7 @@
           <tr v-for="servico in servicos" :key="servico.id" class="border-t">
             <td class="p-3">{{ servico.id }}</td>
             <td>{{ servico.nome }}</td>
-            <td>R$ {{ CurrencyUtils.formatBRL(servico.valor_base_mensal) }}</td>
+            <td>{{ CurrencyUtils.formatCurrency(servico.valor_base_mensal) }}</td>
             <td class="space-x-2">
               <button @click="editar(servico)" class="text-blue-600 text-sm">Editar</button>
               <button @click="remover(servico.id)" class="text-red-600 text-sm">Excluir</button>
