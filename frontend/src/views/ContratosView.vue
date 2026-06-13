@@ -67,7 +67,9 @@
             </td>
             <td>{{ formatDate(contrato.updated_at) }}</td>
             <td class="space-x-2">
-              <router-link :to="`/contratos/${contrato.id}`" class="text-blue-600 text-sm">Ver</router-link>
+              <router-link :to="`/contratos/${contrato.id}`" class="text-blue-600 text-sm">
+                Adicionar Itens
+              </router-link>
               <button @click="toggleStatus(contrato)" class="text-sm text-amber-600">
                 {{ contrato.status === 'Ativo' ? 'Cancelar' : 'Ativar' }}
               </button>

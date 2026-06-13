@@ -7,7 +7,7 @@
 
     <div class="bg-white p-4 rounded shadow mb-6 grid grid-cols-2 md:grid-cols-4 gap-4">
       <div><strong>Cliente:</strong> {{ contrato.cliente?.nome }}</div>
-      <div><strong>Início:</strong> {{ contrato.data_inicio }}</div>
+      <div><strong>Início:</strong> {{ formatDate(contrato.data_inicio) }}</div>
       <div><strong>Status:</strong> {{ contrato.status }}</div>
       <div><strong>Total Mensal:</strong> R$ {{ total.toFixed(2) }}</div>
     </div>
@@ -15,19 +15,32 @@
     <div class="bg-white p-4 rounded shadow">
       <h3 class="font-semibold mb-3">Itens do Contrato</h3>
 
+      <div v-if="apiError" class="bg-red-50 border border-red-400 text-red-700 px-3 py-2 rounded mb-3 text-sm">
+        {{ apiError }}
+      </div>
+
       <form @submit.prevent="adicionarItem" class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
+
         <select v-model="item.servico_id" required class="border p-2 rounded">
           <option value="">Serviço</option>
           <option v-for="servico in servicos" :key="servico.id" :value="servico.id">
             {{ servico.nome }} (R$ {{ servico.valor_base_mensal }})
           </option>
         </select>
-        <input v-model.number="item.quantidade" type="number" min="1" placeholder="Qtd" required
-          class="border p-2 rounded" />
-        <!-- <input v-model.number="item.valor_unitario" type="number" step="0.01" placeholder="Valor unitário" required
-          class="border p-2 rounded" /> -->
-        <input :value="valorItemMask" @input="onValorItemInput" type="text" inputmode="decimal"
-          placeholder="Valor unitário" required class="border p-2 rounded" />
+        <p v-if="errors.servico" class="text-red-600 text-xs mt-1">{{ errors.servico }}</p>
+
+        <div>
+          <input v-model.number="item.quantidade" type="number" min="1" placeholder="Qtd" required
+            class="border p-2 rounded" />
+          <p v-if="errors.quantidade" class="text-red-600 text-xs mt-1">{{ errors.quantidade }}</p>
+        </div>
+
+        <div>
+          <input :value="valorItemMask" @input="onValorItemInput" type="text" inputmode="decimal"
+            placeholder="Valor unitário" required class="border p-2 rounded" />
+          <p v-if="errors.valor" class="text-red-600 text-xs mt-1">{{ errors.valor }}</p>
+        </div>
+
         <button class="bg-cyan-600 text-white rounded px-4">Adicionar</button>
       </form>
 
@@ -89,6 +102,8 @@ const props = defineProps(['id']);
 const contrato = ref(null);
 const servicos = ref([]);
 const item = ref({ servico_id: '', quantidade: 1, valor_unitario: null });
+const apiError = ref('');
+const errors = ref({ servico: '', quantidade: '', valor: '' });
 
 const formatMoney = (val) => {
 
@@ -96,7 +111,17 @@ const formatMoney = (val) => {
     style: 'currency',
     currency: 'BRL'
   });
+
 };
+
+function formatDate(dateString) {
+
+  if (!dateString) {
+    return '-';
+  }
+
+  return new Date(dateString).toLocaleDateString('pt-BR');
+}
 
 const valorItemMask = computed(() => {
 
@@ -143,20 +168,68 @@ const total = computed(() => {
     return sum + subtotal;
 
   }, 0);
-})
+
+});
+
+function handleApiError(error) {
+
+  const msg = error.response?.data?.message || 'Erro ao processar requisição';
+
+  apiError.value = msg;
+
+  const lower = msg.toLowerCase();
+
+  if (lower.includes('serviço') || lower.includes('servico')) {
+
+    errors.value.servico = msg;
+
+  } else if (lower.includes('quantidade')) {
+
+    errors.value.quantidade = msg;
+
+  } else if (lower.includes('valor')) {
+
+    errors.value.valor = msg;
+
+  }
+}
 
 async function carregar() {
 
-  const { data } = await API.getContrato(props.id);
+  try {
 
-  contrato.value = data;
+    const { data } = await API.getContrato(props.id);
 
-  const response = await API.getServicos();
+    contrato.value = data;
 
-  servicos.value = Array.isArray(response.data) ? response.data : response.data.data || [];
+    const response = await API.getServicos();
+
+    servicos.value = Array.isArray(response.data) ? response.data : response.data.data || [];
+
+  } catch (error) {
+    handleApiError(error);
+  }
 }
 
 async function adicionarItem() {
+
+  apiError.value = '';
+
+  errors.value = { servico: '', quantidade: '', valor: '' };
+
+  if (!item.value.servico_id) {
+
+    errors.value.servico = 'Selecione um serviço';
+
+    return;
+  }
+
+  if (!item.value.quantidade || item.value.quantidade < 1) {
+
+    errors.value.quantidade = 'Quantidade inválida';
+
+    return;
+  }
 
   if (!item.value.valor_unitario) {
 
@@ -166,12 +239,18 @@ async function adicionarItem() {
 
   }
 
-  await API.addItem(props.id, item.value);
+  try {
 
-  item.value = { servico_id: '', quantidade: 1, valor_unitario: null };
+    await API.addItem(props.id, item.value);
 
-  carregar();
+    item.value = { servico_id: '', quantidade: 1, valor_unitario: null };
+
+    carregar();
+
+  } catch (error) {
+    handleApiError(error);
+  }
 }
 
-onMounted(carregar)
+onMounted(carregar);
 </script>
