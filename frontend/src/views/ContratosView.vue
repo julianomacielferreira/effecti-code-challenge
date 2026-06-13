@@ -46,9 +46,9 @@
             <th>Início</th>
             <th>Fim</th>
             <th>Status</th>
-            <th>Valor Total</th>
+            <th>Valor Total Mensal</th>
             <th>Itens</th>
-            <th>Última Atualização</th>
+            <th>Atualização</th>
             <th>Ações</th>
           </tr>
         </thead>
@@ -70,15 +70,15 @@
               <router-link :to="`/contratos/${contrato.id}`" class="text-blue-600 text-sm">
                 Adicionar Itens
               </router-link>
-              <button @click="toggleStatus(contrato)" class="text-sm text-amber-600">
-                {{ contrato.status === 'Ativo' ? 'Cancelar' : 'Ativar' }}
+              <button v-if="contrato.status === 'Ativo'" @click="toggleStatus(contrato)" class="text-sm text-amber-600">
+                Cancelar
               </button>
               <button @click="remover(contrato.id)" class="text-sm text-red-600">Excluir</button>
             </td>
           </tr>
         </tbody>
       </table>
-      <p class="text-xs text-gray-500 p-3">Regra: Contrato cancelado não pode ser editado.</p>
+      <p class="text-xs text-gray-500 p-3">Regra: Contratos com status "Cancelado" não podem ser editados.</p>
     </div>
   </div>
 </template>
