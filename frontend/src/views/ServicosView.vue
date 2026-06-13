@@ -15,9 +15,8 @@
           <p v-if="errors.nome" class="text-red-600 text-xs mt-1">{{ errors.nome }}</p>
         </div>
         <div>
-          <input v-model.number="form.valor_base_mensal" @input="validarValor" type="number" step="0.01" min="0.01"
-            placeholder="Valor base mensal" required class="border p-2 rounded w-full"
-            :class="{ 'border-red-500': errors.valor }" />
+          <input :value="valorMask" @input="onValorInput" placeholder="Valor base mensal" required
+            class="border p-2 rounded" />
           <p v-if="errors.valor" class="text-red-600 text-xs mt-1">{{ errors.valor }}</p>
         </div>
         <button :disabled="!formValido" class="bg-cyan-600 text-white rounded px-4 disabled:opacity-50">
@@ -104,6 +103,26 @@ function validarValor() {
   return !errors.value.valor;
 }
 
+const valorMask = computed(() => {
+
+  if (form.value.valor_base_mensal == null) return '';
+
+  return Number(form.value.valor_base_mensal)
+    .toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+})
+
+function onValorInput(element) {
+
+  const digits = element.target.value.replace(/\D/g, '');
+
+  const value = digits ? parseInt(digits, 10) / 100 : null;
+
+  form.value.valor_base_mensal = value;
+
+  element.target.value = value != null ? valorMask.value : '';
+
+}
+
 const formValido = computed(() => validarNome() && validarValor());
 
 async function carregar() {
@@ -111,11 +130,14 @@ async function carregar() {
   const { data } = await api.getServicos({ search: busca.value });
 
   servicos.value = Array.isArray(data) ? data : data.data || [];
+
 }
 
 async function salvar() {
 
-  if (!validarNome() || !validarValor()) return;
+  if (!validarNome() || !validarValor()) {
+    return;
+  }
 
   if (editando.value) {
 
