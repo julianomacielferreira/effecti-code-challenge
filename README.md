@@ -1,11 +1,13 @@
 # Effecti Code Challenge - Teste Técnico PHP (ERP – Contratos e Serviços)
 
 Desenvolvimento de um ERP simplificado focado em Contratos e Serviços recorrentes.
-O projeto é monorepo com backend e frontend separados, roda no Docker utilizando as tecnologias Laravel (API REST) em PHP 8.2 + Vue.js 3 e MySQL.
+O projeto é monorepo com backend e frontend separados, roda no Docker utilizando as tecnologias Laravel (API REST) em PHP 7.4 + Vue.js 3 e MySQL.
 
 Ele foi baseado em um projeto que fiz há 6 anos atrás [Simple API using Laravel Lumen](https://github.com/julianomacielferreira/laravel-api-backend)
 
 Este documento contém as instruções para configurar e rodar o projeto.
+
+![Effecti Code Challenge](effecti-erp-logo.png)
 
 ## URLs principais
 
