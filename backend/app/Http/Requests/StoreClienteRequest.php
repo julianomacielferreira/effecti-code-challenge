@@ -53,6 +53,7 @@ class StoreClienteRequest extends FormRequest
             'cpf_cnpj.required' => 'CPF/CNPJ é obrigatório',
             'cpf_cnpj.unique' => 'Este CPF/CNPJ já está cadastrado.',
             'email.email'       => 'Email inválido',
+            'email.unique'       => 'Este email já está cadastrado.',
         ];
     }
 
