@@ -76,7 +76,7 @@
           <tr v-for="cliente in clientes" :key="cliente.id" class="border-t hover:bg-gray-50 transition-colors">
             <td class="p-3">{{ cliente.id }}</td>
             <td>{{ cliente.nome }}</td>
-            <td>{{ DocumentFormatter.maskCpfCnpj(cliente.cpf_cnpj) }}</td>
+            <td>{{ DocumentFormatter.maskCpfCnpj(cliente.cpf_cnpj || '') }}</td>
             <td>{{ cliente.email }}</td>
             <td>
               <span class="px-2 py-1 rounded text-xs font-medium"
@@ -131,32 +131,8 @@ import { StringUtils } from '../utils/StringUtils';
 import { DocumentFormatter } from '../utils/DocumentFormatter';
 import { EmailValidator } from '../utils/EmailValidator';
 import { DocumentValidatorFactory } from '../utils/validators/DocumentValidatorFactory';
+import { ICliente, IClienteErrors, IClienteFiltros, IClienteForm } from '../models/Cliente';
 import API from '../services/api';
-
-interface ICliente {
-  id: number;
-  nome: string;
-  cpf_cnpj: string;
-  email: string;
-  status: 'Ativo' | 'Inativo';
-}
-
-interface IClienteForm {
-  nome: string;
-  cpf_cnpj: string;
-  email: string;
-}
-
-interface IFiltros {
-  search: string;
-  status: string;
-}
-
-interface IFormErros {
-  nome: string;
-  cpf_cnpj: string;
-  email: string;
-}
 
 class ClienteViewModel {
 
@@ -164,8 +140,8 @@ class ClienteViewModel {
   public showForm: Ref<boolean> = ref(false);
   public editandoId: Ref<number | null> = ref(null);
   public form: Ref<IClienteForm> = ref({ nome: '', cpf_cnpj: '', email: '' });
-  public filtros: Ref<IFiltros> = ref({ search: '', status: '' });
-  public errors: Ref<IFormErros> = ref({ nome: '', cpf_cnpj: '', email: '' });
+  public filtros: Ref<IClienteFiltros> = ref({ search: '', status: '' });
+  public errors: Ref<IClienteErrors> = ref({ nome: '', cpf_cnpj: '', email: '' });
   public apiError: Ref<string> = ref('');
 
   public get formValido() {
@@ -255,8 +231,8 @@ class ClienteViewModel {
 
     this.form.value = {
       nome: cliente.nome,
-      cpf_cnpj: DocumentFormatter.maskCpfCnpj(cliente.cpf_cnpj),
-      email: cliente.email
+      cpf_cnpj: DocumentFormatter.maskCpfCnpj(cliente.cpf_cnpj || ''),
+      email: cliente.email || ''
     };
 
     this.resetErrors();
