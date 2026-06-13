@@ -24,8 +24,10 @@
         </select>
         <input v-model.number="item.quantidade" type="number" min="1" placeholder="Qtd" required
           class="border p-2 rounded" />
-        <input v-model.number="item.valor_unitario" type="number" step="0.01" placeholder="Valor unitário" required
-          class="border p-2 rounded" />
+        <!-- <input v-model.number="item.valor_unitario" type="number" step="0.01" placeholder="Valor unitário" required
+          class="border p-2 rounded" /> -->
+        <input :value="valorItemMask" @input="onValorItemInput" type="text" inputmode="decimal"
+          placeholder="Valor unitário" required class="border p-2 rounded" />
         <button class="bg-cyan-600 text-white rounded px-4">Adicionar</button>
       </form>
 
@@ -42,8 +44,8 @@
           <tr v-for="item in contrato.itens || []" :key="item.id" class="border-t">
             <td class="p-2">{{ item.servico?.nome || item.servico_id }}</td>
             <td>{{ item.quantidade }}</td>
-            <td>R$ {{ Number(item.valor_unitario).toFixed(2) }}</td>
-            <td>R$ {{ (item.quantidade * item.valor_unitario).toFixed(2) }}</td>
+            <td>{{ formatMoney(item.valor_unitario) }}</td>
+            <td>{{ formatMoney(item.quantidade * item.valor_unitario) }}</td>
           </tr>
         </tbody>
       </table>
@@ -88,16 +90,55 @@ const contrato = ref(null);
 const servicos = ref([]);
 const item = ref({ servico_id: '', quantidade: 1, valor_unitario: null });
 
+const formatMoney = (val) => {
+
+  return Number(val || 0).toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL'
+  });
+};
+
+const valorItemMask = computed(() => {
+
+  if (item.value.valor_unitario == null) {
+    return '';
+  }
+
+  return Number(item.value.valor_unitario).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+});
+
+function onValorItemInput(element) {
+
+  const digits = element.target.value.replace(/\D/g, '');
+
+  const num = digits ? parseInt(digits, 10) / 100 : null;
+
+  item.value.valor_unitario = num;
+
+  element.target.value = num != null ? valorItemMask.value : '';
+}
+
+function onServicoChange() {
+
+  const servico = servicos.value.find(s => s.id == item.value.servico_id);
+
+  if (servico) {
+    item.value.valor_unitario = Number(servico.valor_base_mensal);
+  }
+}
+
 const total = computed(() => {
 
-  if (!contrato.value?.itens) return 0;
+  if (!contrato.value?.itens) {
+    return 0;
+  }
 
-  return contrato.value.itens.reduce((sum, i) => {
+  return contrato.value.itens.reduce((sum, item) => {
 
-    let subtotal = i.quantidade * i.valor_unitario;
+    let subtotal = item.quantidade * item.valor_unitario;
 
     //@TODO - Remover Regra de negócio é aplicada no backend: desconto por quantidade
-    if (i.quantidade >= 10) subtotal *= 0.9;
+    if (item.quantidade >= 10) subtotal *= 0.9;
 
     return sum + subtotal;
 
@@ -110,9 +151,9 @@ async function carregar() {
 
   contrato.value = data;
 
-  const responseServicos = await API.getServicos();
+  const response = await API.getServicos();
 
-  servicos.value = Array.isArray(responseServicos.data) ? responseServicos.data : responseServicos.data.data || [];
+  servicos.value = Array.isArray(response.data) ? response.data : response.data.data || [];
 }
 
 async function adicionarItem() {

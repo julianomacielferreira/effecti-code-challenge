@@ -129,9 +129,9 @@ async function carregar() {
 
   contratos.value = Array.isArray(data) ? data : data.data || [];
 
-  const responseClientes = await API.getClientes();
+  const response = await API.getClientes();
 
-  clientes.value = Array.isArray(responseClientes.data) ? responseClientes.data : responseClientes.data.data || [];
+  clientes.value = Array.isArray(response.data) ? response.data : response.data.data || [];
 }
 
 async function salvar() {
@@ -154,9 +154,9 @@ async function toggleStatus(contrato) {
   // REGRA DE NEGÓCIO: não ativar sem itens
   if (novo === 'Ativo') {
 
-    const { data } = await API.getContrato(contrato.id);
+    const { response } = await API.getContrato(contrato.id);
 
-    if (!data.itens || data.itens.length === 0) {
+    if (!response.itens || response.itens.length === 0) {
 
       alert('Não é possível ativar: contrato precisa ter pelo menos 1 serviço.');
 
