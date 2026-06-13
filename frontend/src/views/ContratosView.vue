@@ -131,39 +131,9 @@ import { ref, onMounted, computed, Ref } from 'vue';
 import { DateUtils } from '../utils/DateUtils';
 import { CurrencyUtils } from '../utils/CurrencyUtils';
 import { ApiHelper } from '../utils/ApiHelper';
+import { IContrato, IContratoErrors, IContratoForm } from '../models/Contrato';
+import { ICliente } from '../models/Cliente';
 import API from '../services/api';
-
-interface ICliente {
-  id: number;
-  nome: string;
-}
-
-interface IContratoItem {
-  id: number;
-}
-
-interface IContrato {
-  id: number;
-  cliente_id: number;
-  cliente?: ICliente;
-  data_inicio: string;
-  data_termino?: string;
-  status: 'Ativo' | 'Cancelado';
-  valor_total: number;
-  itens?: IContratoItem[];
-  updated_at: string;
-}
-
-interface IContratoForm {
-  cliente_id: number | string;
-  data_inicio: string;
-  status: 'Ativo' | 'Cancelado';
-}
-
-interface IContratoErrors {
-  cliente: string;
-  data: string;
-}
 
 class ContratoViewModel {
 

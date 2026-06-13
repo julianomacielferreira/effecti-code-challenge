@@ -65,8 +65,8 @@
           <tr v-for="itemObj in contrato.itens || []" :key="itemObj.id" class="border-t">
             <td class="p-2">{{ itemObj.servico?.nome || itemObj.servico_id }}</td>
             <td>{{ itemObj.quantidade }}</td>
-            <td>{{ CurrencyUtils.formatCurrency(itemObj.valor_unitario) }}</td>
-            <td>{{ CurrencyUtils.formatCurrency(itemObj.quantidade * itemObj.valor_unitario) }}</td>
+            <td>{{ CurrencyUtils.formatCurrency(itemObj.valor_unitario || 0) }}</td>
+            <td>{{ CurrencyUtils.formatCurrency((itemObj.quantidade || 0) * (itemObj.valor_unitario || 0)) }}</td>
           </tr>
         </tbody>
       </table>
@@ -108,49 +108,9 @@ import { ref, onMounted, computed, Ref } from 'vue';
 import { DateUtils } from '../utils/DateUtils';
 import { CurrencyUtils } from '../utils/CurrencyUtils';
 import { ApiHelper } from '../utils/ApiHelper';
+import { IContrato, IContratoItemErrors, IContratoItemForm } from '../models/Contrato';
+import { IServico } from '../models/Servico';
 import API from '../services/api';
-
-interface IServico {
-  id: number;
-  nome: string;
-  valor_base_mensal: number;
-}
-
-interface IContratoItem {
-  id: number;
-  servico_id: number;
-  servico?: IServico;
-  quantidade: number;
-  valor_unitario: number;
-}
-
-interface IContratoTotais {
-  subtotal: number;
-  desconto_total: number;
-  total: number;
-  regras_aplicadas?: string[];
-}
-
-interface IContratoDetalhe {
-  id: number;
-  cliente?: { nome: string };
-  data_inicio: string;
-  status: string;
-  itens?: IContratoItem[];
-  totais: IContratoTotais;
-}
-
-interface IItemForm {
-  servico_id: number | string;
-  quantidade: number;
-  valor_unitario: number | null;
-}
-
-interface IItemErrors {
-  servico: string;
-  quantidade: string;
-  valor: string;
-}
 
 const props = defineProps<{ id: string | number }>();
 
@@ -158,12 +118,12 @@ class ContratoItensViewModel {
 
   private contratoId: string | number;
 
-  public contrato: Ref<IContratoDetalhe | null> = ref(null);
+  public contrato: Ref<IContrato | null> = ref(null);
   public servicos: Ref<IServico[]> = ref([]);
   public regras_aplicadas: Ref<string[]> = ref([]);
-  public item: Ref<IItemForm> = ref({ servico_id: '', quantidade: 1, valor_unitario: null });
+  public item: Ref<IContratoItemForm> = ref({ servico_id: '', quantidade: 1, valor_unitario: null });
   public apiError: Ref<string> = ref('');
-  public errors: Ref<IItemErrors> = ref({ servico: '', quantidade: '', valor: '' });
+  public errors: Ref<IContratoItemErrors> = ref({ servico: '', quantidade: '', valor: '' });
 
   constructor(contratoId: string | number) {
     this.contratoId = contratoId;
