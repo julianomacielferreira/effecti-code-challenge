@@ -1112,6 +1112,7 @@ Acesse http://localhost:5173
 - [nginx](https://nginx.org/)
 - [Vue.js - The Progressive JavaScript Framework](https://vuejs.org/)
 - [Vite | Next Generation Frontend Tooling](https://vite.dev/)
+- [Tailwind CSS - Rapidly build modern websites without ever leaving your HTML](https://tailwindcss.com/)
 
 ## License
 
