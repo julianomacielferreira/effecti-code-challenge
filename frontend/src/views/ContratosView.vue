@@ -8,6 +8,11 @@
     </div>
 
     <div v-if="showForm" class="bg-white p-4 rounded shadow mb-6">
+
+      <div v-if="apiError" class="bg-red-50 border border-red-400 text-red-700 px-3 py-2 rounded mb-3 text-sm">
+        {{ apiError }}
+      </div>
+
       <form @submit.prevent="salvar" class="grid grid-cols-1 md:grid-cols-4 gap-3">
         <div>
           <select v-model="form.cliente_id" @change="validarForm" required class="border p-2 rounded w-full"
@@ -104,6 +109,7 @@ const clientes = ref([]);
 const showForm = ref(false);
 const form = ref({ cliente_id: '', data_inicio: new Date().toISOString().slice(0, 10), status: 'Ativo' });
 const errors = ref({ cliente: '', data: '' });
+const apiError = ref('');
 
 function validarForm() {
 
@@ -116,6 +122,25 @@ function validarForm() {
 
 const formValido = computed(() => validarForm());
 
+function handleApiError(error) {
+
+  const msg = error.response?.data?.message || 'Erro ao processar requisição';
+
+  apiError.value = msg;
+
+  const lower = msg.toLowerCase();
+
+  if (lower.includes('cliente')) {
+
+    errors.value.cliente = msg;
+
+  } else if (lower.includes('data')) {
+
+    errors.value.data = msg;
+
+  }
+}
+
 function calcularTotal(contrato) {
 
   if (!contrato.itens) return 0;
@@ -125,59 +150,89 @@ function calcularTotal(contrato) {
 
 async function carregar() {
 
-  const { data } = await API.getContratos();
+  try {
 
-  contratos.value = Array.isArray(data) ? data : data.data || [];
+    const { data } = await API.getContratos();
 
-  const response = await API.getClientes();
+    contratos.value = Array.isArray(data) ? data : data.data || [];
 
-  clientes.value = Array.isArray(response.data) ? response.data : response.data.data || [];
+    const response = await API.getClientes();
+
+    clientes.value = Array.isArray(response.data) ? response.data : response.data.data || [];
+
+  } catch (error) {
+    handleApiError(error);
+  }
 }
 
 async function salvar() {
 
-  if (!validarForm()) return;
+  apiError.value = '';
 
-  await API.createContrato(form.value);
+  if (!validarForm()) {
+    return;
+  }
 
-  showForm.value = false;
+  try {
 
-  form.value = { cliente_id: '', data_inicio: new Date().toISOString().slice(0, 10), status: 'Ativo' };
+    await API.createContrato(form.value);
 
-  carregar();
+    showForm.value = false;
+
+    form.value = { cliente_id: '', data_inicio: new Date().toISOString().slice(0, 10), status: 'Ativo' };
+
+    carregar();
+
+  } catch (error) {
+    handleApiError(error);
+  }
 }
 
 async function toggleStatus(contrato) {
 
   const novo = contrato.status === 'Ativo' ? 'Cancelado' : 'Ativo';
 
-  // REGRA DE NEGÓCIO: não ativar sem itens
-  if (novo === 'Ativo') {
+  try {
 
-    const { response } = await API.getContrato(contrato.id);
+    if (novo === 'Ativo') {
 
-    if (!response.itens || response.itens.length === 0) {
+      const { data } = await API.getContrato(contrato.id);
 
-      alert('Não é possível ativar: contrato precisa ter pelo menos 1 serviço.');
+      if (!data.itens || data.itens.length === 0) {
 
-      return;
+        apiError.value = 'Não é possível ativar: contrato precisa ter pelo menos 1 serviço.';
+
+        alert(apiError.value);
+
+        return;
+      }
+
     }
+
+    await API.updateContrato(contrato.id, { status: novo });
+
+    carregar();
+
+  } catch (error) {
+    handleApiError(error);
   }
-
-  await API.updateContrato(contrato.id, { status: novo });
-
-  carregar();
 }
 
 async function remover(id) {
 
   if (confirm('Excluir contrato ?')) {
 
-    await API.deleteContrato(id);
+    try {
 
-    carregar();
+      await API.deleteContrato(id);
+
+      carregar();
+
+    } catch (error) {
+      handleApiError(error);
+    }
   }
 }
 
-onMounted(carregar)
+onMounted(carregar);
 </script>
