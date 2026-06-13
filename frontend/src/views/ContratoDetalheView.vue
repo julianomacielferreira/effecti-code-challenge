@@ -21,7 +21,7 @@
 
       <form @submit.prevent="adicionarItem" class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-4">
 
-        <select v-model="item.servico_id" required class="border p-2 rounded">
+        <select v-model="item.servico_id" @change="onServicoChange" required class="border p-2 rounded">
           <option value="">Serviço</option>
           <option v-for="servico in servicos" :key="servico.id" :value="servico.id">
             {{ servico.nome }} (R$ {{ servico.valor_base_mensal }})
