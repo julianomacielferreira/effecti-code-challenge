@@ -8,15 +8,20 @@
     </div>
 
     <div v-if="showForm" class="bg-white p-4 rounded shadow mb-6">
+
+      <div v-if="apiError" class="bg-red-50 border border-red-400 text-red-700 px-3 py-2 rounded mb-3 text-sm">
+        {{ apiError }}
+      </div>
+
       <form @submit.prevent="salvar" class="grid grid-cols-1 md:grid-cols-3 gap-3">
         <div>
-          <input v-model="form.nome" @blur="validarNome" placeholder="Nome do serviço" required
+          <input v-model="form.nome" @blur="validarNome" @input="apiError = ''" placeholder="Nome do serviço" required
             class="border p-2 rounded w-full" :class="{ 'border-red-500': errors.nome }" />
           <p v-if="errors.nome" class="text-red-600 text-xs mt-1">{{ errors.nome }}</p>
         </div>
         <div>
           <input :value="valorMask" @input="onValorInput" placeholder="Valor base mensal" required
-            class="border p-2 rounded" />
+            class="border p-2 rounded w-full" :class="{ 'border-red-500': errors.valor }" />
           <p v-if="errors.valor" class="text-red-600 text-xs mt-1">{{ errors.valor }}</p>
         </div>
         <button :disabled="!formValido" class="bg-cyan-600 text-white rounded px-4 disabled:opacity-50">
@@ -86,6 +91,7 @@ const editando = ref(null);
 const form = ref({ nome: '', valor_base_mensal: null });
 const busca = ref('');
 const errors = ref({ nome: '', valor: '' });
+const apiError = ref('');
 
 function validarNome() {
 
@@ -109,7 +115,7 @@ const valorMask = computed(() => {
 
   return Number(form.value.valor_base_mensal)
     .toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-})
+});
 
 function onValorInput(element) {
 
@@ -123,41 +129,66 @@ function onValorInput(element) {
 
 }
 
+function handleApiError(error) {
+
+  const msg = error.response?.data?.message || 'Erro ao processar requisição';
+
+  apiError.value = msg;
+
+  const lower = msg.toLowerCase();
+
+  if (lower.includes('nome')) errors.value.nome = msg; // ADICIONE
+
+  else if (lower.includes('valor')) errors.value.valor = msg; // ADICIONE
+}
+
 const formValido = computed(() => validarNome() && validarValor());
 
 async function carregar() {
+  try {
 
-  const { data } = await API.getServicos({ search: busca.value });
+    const { data } = await API.getServicos({ search: busca.value });
 
-  servicos.value = Array.isArray(data) ? data : data.data || [];
+    servicos.value = Array.isArray(data) ? data : data.data || [];
 
+  } catch (error) {
+    handleApiError(error);
+  }
 }
 
 async function salvar() {
+
+  apiError.value = '';
 
   if (!validarNome() || !validarValor()) {
     return;
   }
 
-  if (editando.value) {
+  try {
 
-    await API.updateServico(editando.value, form.value);
+    if (editando.value) {
 
-  } else {
+      await API.updateServico(editando.value, form.value);
 
-    await API.createServico(form.value);
+    } else {
 
+      await API.createServico(form.value);
+
+    }
+
+    form.value = { nome: '', valor_base_mensal: null };
+
+    showForm.value = false;
+
+    editando.value = null;
+
+    errors.value = { nome: '', valor: '' };
+
+    carregar();
+
+  } catch (error) {
+    handleApiError(error);
   }
-
-  form.value = { nome: '', valor_base_mensal: null };
-
-  showForm.value = false;
-
-  editando.value = null;
-
-  errors.value = { nome: '', valor: '' };
-
-  carregar();
 }
 
 function editar(servico) {
@@ -171,13 +202,20 @@ function editar(servico) {
 
 async function remover(id) {
 
-  if (confirm('Excluir serviço?')) {
+  if (!confirm('Excluir serviço?')) {
+    return;
+  }
+
+  try {
 
     await API.deleteServico(id);
 
     carregar();
+
+  } catch (error) {
+    handleApiError(error);
   }
 }
 
-onMounted(carregar)
+onMounted(carregar);
 </script>
