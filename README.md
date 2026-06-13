@@ -3,7 +3,9 @@
 Desenvolvimento de um ERP simplificado focado em Contratos e Serviços recorrentes.
 O projeto é monorepo com backend e frontend separados, roda no Docker utilizando as tecnologias Laravel (API REST) em PHP 8.2 + Vue.js 3 e MySQL.
 
-Veja mais abaixo as instruções para configurar e rodar o projeto.
+Ele foi baseado em um projeto que fiz há 6 anos atrás [Simple API using Laravel Lumen](https://github.com/julianomacielferreira/laravel-api-backend)
+
+Este documento contém as instruções para configurar e rodar o projeto.
 
 ## URLs principais
 
@@ -18,6 +20,236 @@ Veja mais abaixo as instruções para configurar e rodar o projeto.
 - **Frontend**: Vue.js 3 + Vite
 - **Banco**: MySQL 8
 - **Docker / docker-compose**
+
+## Estrutura do Projeto
+
+```
+.
+├── backend
+│   ├── app
+│   │   ├── Console
+│   │   │   └── Kernel.php
+│   │   ├── Exceptions
+│   │   │   └── Handler.php
+│   │   ├── Http
+│   │   │   ├── Controllers
+│   │   │   │   ├── ClienteController.php
+│   │   │   │   ├── ContratoController.php
+│   │   │   │   ├── Controller.php
+│   │   │   │   └── ServicoController.php
+│   │   │   ├── Kernel.php
+│   │   │   ├── Middleware
+│   │   │   │   ├── Authenticate.php
+│   │   │   │   ├── EncryptCookies.php
+│   │   │   │   ├── PreventRequestsDuringMaintenance.php
+│   │   │   │   ├── RedirectIfAuthenticated.php
+│   │   │   │   ├── TrimStrings.php
+│   │   │   │   ├── TrustHosts.php
+│   │   │   │   ├── TrustProxies.php
+│   │   │   │   └── VerifyCsrfToken.php
+│   │   │   └── Requests
+│   │   │       ├── StoreClienteRequest.php
+│   │   │       ├── StoreContratoItemRequest.php
+│   │   │       ├── StoreContratoRequest.php
+│   │   │       ├── StoreServicoRequest.php
+│   │   │       ├── UpdateClienteRequest.php
+│   │   │       ├── UpdateContratoRequest.php
+│   │   │       └── UpdateServicoRequest.php
+│   │   ├── Models
+│   │   │   ├── Cliente.php
+│   │   │   ├── ContratoItem.php
+│   │   │   ├── Contrato.php
+│   │   │   ├── Servico.php
+│   │   │   └── User.php
+│   │   ├── Providers
+│   │   │   ├── AppServiceProvider.php
+│   │   │   ├── AuthServiceProvider.php
+│   │   │   ├── BroadcastServiceProvider.php
+│   │   │   ├── EventServiceProvider.php
+│   │   │   └── RouteServiceProvider.php
+│   │   ├── Repositories
+│   │   │   ├── ClienteRepository.php
+│   │   │   ├── ContratoRepository.php
+│   │   │   └── ServicoRepository.php
+│   │   ├── Rules
+│   │   │   ├── Contrato
+│   │   │   │   ├── AcrescimoPremiumRule.php
+│   │   │   │   ├── ContratoRule.php
+│   │   │   │   ├── DescontoFidelidadeRule.php
+│   │   │   │   ├── DescontoPorQuantidadeRule.php
+│   │   │   │   └── SemDescontoRule.php
+│   │   │   └── CpfCnpj.php
+│   │   └── Services
+│   │       ├── CalculadoraDeContrato.php
+│   │       ├── ClienteService.php
+│   │       ├── ContratoService.php
+│   │       └── ServicoService.php
+│   ├── artisan
+│   ├── bootstrap
+│   │   ├── app.php
+│   │   └── cache
+│   ├── composer.json
+│   ├── composer.lock
+│   ├── config
+│   │   ├── app.php
+│   │   ├── auth.php
+│   │   ├── broadcasting.php
+│   │   ├── cache.php
+│   │   ├── contrato.php
+│   │   ├── cors.php
+│   │   ├── database.php
+│   │   ├── filesystems.php
+│   │   ├── hashing.php
+│   │   ├── l5-swagger.php
+│   │   ├── logging.php
+│   │   ├── mail.php
+│   │   ├── queue.php
+│   │   ├── sanctum.php
+│   │   ├── services.php
+│   │   ├── session.php
+│   │   └── view.php
+│   ├── database
+│   │   ├── factories
+│   │   │   ├── ClienteFactory.php
+│   │   │   ├── ContratoFactory.php
+│   │   │   ├── ContratoItemFactory.php
+│   │   │   ├── ServicoFactory.php
+│   │   │   └── UserFactory.php
+│   │   ├── migrations
+│   │   │   ├── 2026_06_11_220654_create_clientes_table.php
+│   │   │   ├── 2026_06_11_220704_create_servicos_table.php
+│   │   │   ├── 2026_06_11_220717_create_contratos_table.php
+│   │   │   ├── 2026_06_11_220732_create_contrato_itens_table.php
+│   │   │   └── 2026_06_11_222838_create_contratos_valor_view.php
+│   │   └── seeders
+│   │       └── DatabaseSeeder.php
+│   ├── Dockerfile
+│   ├── package.json
+│   ├── phpunit.xml
+│   ├── public
+│   │   ├── favicon.ico
+│   │   ├── index.php
+│   │   └── robots.txt
+│   ├── README.md
+│   ├── resources
+│   │   ├── css
+│   │   │   └── app.css
+│   │   ├── js
+│   │   │   ├── app.js
+│   │   │   └── bootstrap.js
+│   │   ├── lang
+│   │   │   └── en
+│   │   │       ├── auth.php
+│   │   │       ├── pagination.php
+│   │   │       ├── passwords.php
+│   │   │       └── validation.php
+│   │   └── views
+│   │       ├── vendor
+│   │       │   └── l5-swagger
+│   │       │       └── index.blade.php
+│   │       └── welcome.blade.php
+│   ├── routes
+│   │   ├── api.php
+│   │   ├── channels.php
+│   │   ├── console.php
+│   │   └── web.php
+│   ├── server.php
+│   ├── storage
+│   │   ├── api-docs
+│   │   │   └── api-docs.json
+│   │   ├── app
+│   │   │   └── public
+│   │   └── framework
+│   │       ├── cache
+│   │       │   └── data
+│   │       ├── sessions
+│   │       ├── testing
+│   │       └── views
+│   ├── tests
+│   │   ├── CreatesApplication.php
+│   │   ├── Feature
+│   │   │   └── Api
+│   │   │       ├── ClienteControllerTest.php
+│   │   │       ├── ContratoControllerTest.php
+│   │   │       └── ServicoControllerTest.php
+│   │   ├── TestCase.php
+│   │   └── Unit
+│   │       ├── Models
+│   │       │   ├── ClienteTest.php
+│   │       │   ├── ContratoItemTest.php
+│   │       │   ├── ContratoTest.php
+│   │       │   └── ServicoTest.php
+│   │       ├── Repositories
+│   │       │   ├── ClienteRepositoryTest.php
+│   │       │   ├── ContratoRepositoryTest.php
+│   │       │   └── ServicoRepositoryTest.php
+│   │       ├── Requests
+│   │       │   ├── StoreClienteRequestTest.php
+│   │       │   ├── StoreContratoItemRequestTest.php
+│   │       │   ├── StoreContratoRequestTest.php
+│   │       │   ├── UpdateClienteRequestTest.php
+│   │       │   └── UpdateContratoRequestTest.php
+│   │       ├── Rules
+│   │       │   ├── Contrato
+│   │       │   │   ├── AcrescimoPremiumRuleTest.php
+│   │       │   │   ├── DescontoFidelidadeRuleTest.php
+│   │       │   │   ├── DescontoPorQuantidadeRuleTest.php
+│   │       │   │   └── SemDescontoRuleTest.php
+│   │       │   └── CpfCnpjRuleTest.php
+│   │       └── Services
+│   │           ├── CalculadoraDeContratoTest.php
+│   │           ├── ClienteServiceTest.php
+│   │           ├── ContratoServiceTest.php
+│   │           └── ServicoServiceTest.php
+│   └── webpack.mix.js
+├── db_model_effecti_erp.png
+├── docker
+│   ├── mysql
+│   │   └── schema.sql
+│   └── nginx
+│       └── default.conf
+├── docker-compose.yml
+├── effecti-erp-frontend.png
+├── Effecti ERP.postman_collection.json
+├── effecti-erp-swagger-docs.png
+├── frontend
+│   ├── index.html
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── src
+│   │   ├── App.vue
+│   │   ├── main.js
+│   │   ├── models
+│   │   │   ├── Cliente.ts
+│   │   │   ├── Contrato.ts
+│   │   │   └── Servico.ts
+│   │   ├── router
+│   │   │   └── index.js
+│   │   ├── services
+│   │   │   └── api.js
+│   │   ├── utils
+│   │   │   ├── ApiHelper.ts
+│   │   │   ├── CurrencyUtils.ts
+│   │   │   ├── DateUtils.ts
+│   │   │   ├── DocumentFormatter.ts
+│   │   │   ├── EmailValidator.ts
+│   │   │   ├── StringUtils.ts
+│   │   │   └── validators
+│   │   │       ├── CnpjValidator.ts
+│   │   │       ├── CpfValidator.ts
+│   │   │       ├── DocumentValidatorFactory.ts
+│   │   │       └── IDocumentValidator.ts
+│   │   └── views
+│   │       ├── ClientesView.vue
+│   │       ├── ContratoDetalheView.vue
+│   │       ├── ContratosView.vue
+│   │       └── ServicosView.vue
+│   └── vite.config.js
+├── .gitignore
+├── LICENSE
+└── README.md
+
+```
 
 ## Configuração do arquivo .ENV
 
@@ -1113,6 +1345,7 @@ Acesse http://localhost:5173
 - [Vue.js - The Progressive JavaScript Framework](https://vuejs.org/)
 - [Vite | Next Generation Frontend Tooling](https://vite.dev/)
 - [Tailwind CSS - Rapidly build modern websites without ever leaving your HTML](https://tailwindcss.com/)
+- [axios | Promise based HTTP client](https://axios.rest/)
 
 ## License
 
